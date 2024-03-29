@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins&family=Roboto&family=Ubuntu&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Open Sans', 'Poppins', Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    font-size: 15px;
+    color: rgb(0, 0, 0);
+    background-color: #E4E9FD;
+    background-image: -webkit-linear-gradient(65deg, #2c5c92 50%, #72c2e5 50%);
+}
+
+form {
+    display: block;
+    padding: 3rem 5rem;
+    border: 0.8rem solid #02364e;
+    border-radius: 10%;
+    background-color: #a1e1ff;
+}
+
+.form-inp {
+    padding: 0.3rem;
+    font-size: 1.2rem;
+    width: 20rem;
+    border: 3px solid rgb(94, 94, 94);
+    border-radius: 10px;
+    outline: none;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.form-inp:focus {
+    border-color: #000;
+}
+
+select {
+    padding: 0.5rem;
+    width: 10rem;
+    border: 0.3rem solid rgb(85, 85, 85);
+    font-size: 1.4rem;
+}
+
+button {
+    display: block;
+    background: linear-gradient(90deg, #0162c8, #55e7fc);
+    font-size: 1.3rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 3px solid #003267;
+    transition: 0.3s;
+    width: 18rem;
+    height: 3.2rem;
+}
+
+button:hover {
+    width: 20rem;
+    color: #fff;
+    background: linear-gradient(90deg, #003976, #45bed0);
+}
+
+.helpLink {
+    color: rgb(22, 136, 207);
+    text-decoration: none;
+}
+
+.helpLink:hover {
+    text-decoration: underline;
+}
+
+#showPassword {
+    cursor: pointer;
+    padding: 0.4rem;
+}
+
+#show {
+    position: relative;
+    top: 1px;
+    cursor: pointer;
+}
+
+.errorBox.error {
+    border: 5px solid red;
+    background-color: rgb(250, 147, 147);
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    width: 18rem;
+    border-radius: 20px;
+    font-size: 1.2rem;
+}
+
+#showPassword {
+    margin-left: 0;
+}
+
+.title {
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 1.5rem;
+}
+
+button[type="submit"] {
+    margin-top: 0.3rem;
+}
+
+@keyframes ripple {
+    0% {
+        width: 0px;
+        height: 0px;
+    }
+
+    100% {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 1000px) {
+    body {
+        font-size: 25px;
+    }
+}

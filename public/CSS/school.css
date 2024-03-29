@@ -1,0 +1,125 @@
+*{
+    box-sizing: border-box;
+}
+.school-title{
+    font-size: 1.4rem !important;
+    background-color:#02364e;
+    padding: 10px !important;
+    color:white;
+    font:normal bold 14px Tahoma, Verdana, sans-serif;
+}
+label {
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    padding: 6px 6px 6px 0;
+    display:inline-block;
+}
+.container{
+    margin: 20px 25% 0 25%;
+    padding: auto;
+    border: 2px none #02364e;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+}
+.formContainer {
+    margin: 10px 10px 0 10px;
+    padding:5px;
+}
+.form-inp {
+    width: 95%;
+    padding: 5px;
+    border: 2.5px solid rgb(197, 197, 197);
+    background-color:white;
+    border-radius: 9px;
+    font-size: large;
+    text-align: left;
+    margin-left:5px ;
+    margin-right: 5px;
+}
+.column {
+    float: left;
+    width: 50%;
+    padding: 2px;
+  }
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;                                
+  }
+.form-inp:focus {
+    border-color: #000;
+}
+select {
+    padding: 0 0.1rem;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    outline: none;
+    cursor: pointer;
+    border-radius: 0.3rem;
+}
+/* Checkbox */
+.checkbox {         
+    margin-top: 2.5rem ;
+    margin-left: 1rem;
+    height: 1rem;
+    width: 1rem;
+  }
+ 
+.submitbutton {
+    user-select: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 0.5rem 1rem;
+    background-color: #1abc9c;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    margin: 1rem;
+    color: #fff;
+    transition: 0.2s ease;
+}
+
+.submitbutton:hover {
+    background-color: #2eaf96;
+}
+.resetbutton {
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 0.5rem 1rem;
+    background-color: #f4f4f4;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    transition: 0.2s ease;
+    margin-top: 1rem;
+    user-select: none;
+}
+/*sucharitha 4.8*/
+.checked{
+    margin-left: 20px;
+}
+.isLeader{
+    margin:-6.7px;
+    padding:7.5px;
+    margin-top: 30px;
+    margin-left: 2px;
+}
+/*sucharitha 4.8*/
+/* Mobile screens  */
+@media (max-width:500px) {
+   
+    #mobilescreen {
+         border: 2.5px solid rgb(197, 197, 197) !important;
+         background-color:#f2f2f2 !important;
+         border-radius: 9px !important;
+         text-align:  left !important;
+         margin-top: 0px !important;
+         margin-left: 2.5rem !important;
+         margin-right: 0px !important;
+ 
+         }
+      .column{
+         width: 100% !important;
+         }
+         .checkbox{
+             margin-top: 5px !important;
+         }  
+    }

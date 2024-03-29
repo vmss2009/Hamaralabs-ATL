@@ -1,0 +1,23 @@
+.infoContainer {
+    font-size: 1.2rem;
+}
+
+.infoLinkContainer {
+    margin: 2rem;
+}
+
+.infoLink {
+    color: #000;
+    text-decoration: none;
+    background-color: #e8e8e8;
+    padding: 1rem 1.5rem;
+    border-radius: 5px;
+    border: 2px solid #000;
+    transition: 0.3s all;
+}
+
+.infoLink:hover {
+    background-color: rgb(121, 121, 121);
+    color: #fff;
+    border-color: #dbdbdb;
+}

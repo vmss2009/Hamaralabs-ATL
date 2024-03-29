@@ -1,0 +1,28 @@
+.text-color{
+    color:blue;
+}
+.count{
+    position: absolute !important;
+    top:12.5rem !important;
+    left: 35em !important; 
+    font-size:20px !important;      
+ }
+ @media (max-width: 910px) {
+    .box {
+        max-height: unset;
+        overflow: unset;
+        overflow-x: auto;
+        min-height: unset;
+    }
+}
+/* Mobile screens  */
+@media (max-width:500px) {
+    #mobilescreen-studentreport{
+        .count{
+            position: relative !important;
+            top: 5px !important;
+            left: 0px !important;  
+            font-size:20px !important;      
+         }
+    }
+}
