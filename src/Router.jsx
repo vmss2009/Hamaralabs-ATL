@@ -330,7 +330,7 @@ const Router = createBrowserRouter([
     },
     {
         path: "/notifications",
-        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <Notifications /> : <NoAccess name={"Notifications"}/>) : (<Login />),
+        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") || (role === "mentor") || (role === "atlIncharge") ? <Notifications /> : <NoAccess name={"Notifications"}/>) : (<Login />),
     },
     {
         path: "/offline",

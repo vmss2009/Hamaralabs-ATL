@@ -92,26 +92,52 @@ export const sendMessage = async (FCMToken, title, body) => {
 export const notificationsToAdmins = async (title, body) => {
   const q = query(collection(db, "atlUsers"), where("role", "==", "admin"));
   const querySnapshot = await getDocs(q);
-  querySnapshot.forEach(async (docSnap) => {
+  const docs = querySnapshot.docs;
+
+  for (let i = 0; i < docs.length; i++) {
+    const docSnap = docs[i];
     const snapData = docSnap.data();
-      if (snapData.notificationFCMToken !== undefined) {
-        // console.log(snapData.notificationFCMToken, snapData.name);
-        await sendMessage(snapData.notificationFCMToken, title, body);
-        setTimeout(1000);
-      }
-      let notifications = [];
+    if (snapData.notificationFCMToken !== undefined) {
+      await sendMessage(snapData.notificationFCMToken, title, body);
+      setTimeout(1000);
+    }
+    let notifications = [];
 
-      if (snapData.notifications !== undefined) {
-          notifications = snapData.notifications;
-      }
+    if (snapData.notifications !== undefined) {
+      notifications = snapData.notifications;
+    }
 
-      notifications.push({
-          title: title,
-          body: body
-      });
+    notifications.push({
+      title: title,
+      body: body
+    });
 
-      setDoc(doc(db, "atlUsers", docSnap.id), { notifications: notifications }, { merge: true });
-  });
+    await setDoc(doc(db, "atlUsers", docSnap.id), { notifications: notifications }, { merge: true });
+  }
+}
+
+export const notificationsToUsers = async (usersRef, title, body) => {
+  for (let i = 0; i < usersRef.length; i++) {
+    const userRef = usersRef[i];
+    const userDoc = await getDoc(userRef);
+    const user = userDoc.data();
+    let notifications = [];
+
+    if (user.notifications !== undefined) {
+      notifications = user.notifications;
+    }
+
+    notifications.push({
+      title: title,
+      body: body
+    });
+
+    if (user.notificationFCMToken !== undefined) {
+      await sendMessage(user.notificationFCMToken, title, body);
+    }
+
+    await setDoc(userRef, { notifications: notifications }, { merge: true });
+  }
 }
 
 export const notificationsToUser = async (userRef, title, body) => {

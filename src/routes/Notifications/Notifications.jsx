@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
 import {db} from "../../firebase/firestore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import {Bars} from "react-loader-spinner";
 
 function Notifications() {
     const [notifications, setNotifications] = useState([]);
-    const [displayOption, setDisplayOption] = useState("");
+    const [displayOption, setDisplayOption] = useState("TA Completed");
+    const [loading, setLoading] = useState(false);
     const sections = ["TA Completed", "New Message"];
     const values = ["TA Completed", "Chats"];
 
@@ -31,13 +33,31 @@ function Notifications() {
     }, [displayOption]);
 
     const closeNotification = async (index) => {
+        setLoading(true);
         const userDoc = doc(db, "atlUsers", uid);
         const notifcationsDoc = await getDoc(userDoc);
         const notificationsData =  notifcationsDoc.data().notifications;
         const newNotifications = notificationsData.filter((_, i) => i !== index);
         await setDoc(userDoc, {notifications: newNotifications}, {merge: true});
         setNotifications(notifications.filter((_, i) => i !== index));
+        setLoading(false);
     };
+
+    if (loading) {
+        return (
+            <div style={{height: "85%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+                {<Bars
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="black"
+                    ariaLabel="loading"
+                    wrapperStyle
+                    wrapperClass
+                />}
+            </div>
+        );
+    }
 
     return (
         <div style={{display: 'flex'}}>

@@ -18,7 +18,7 @@ import MessageComp from "../ChatWithAdmin/MessageComp";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
 import { orderBy } from "lodash";
-import { notificationsToAdmins } from "../../firebase/cloudmessaging";
+import { notificationsToAdmins, notificationsToUsers } from "../../firebase/cloudmessaging";
 
 function Chat() {
   const { groupId } = useParams();
@@ -105,6 +105,10 @@ function Chat() {
     } else if (message !== "") {
       const dataArray = [...data];
       const timeStamp = Date.now();
+      const groupData = await getDoc(groupRef);
+      const senderRef = doc(db, "atlUsers", uid);
+      const senderData = await getDoc(senderRef);
+      
       // Adding date and time to the database along with other content
       dataArray.push({
         senderRef: doc(db, "atlUsers", uid),
@@ -120,11 +124,16 @@ function Chat() {
         },
         { merge: true }
       );
-      const groupData = await getDoc(groupRef);
-      const senderRef = doc(db, "atlUsers", uid);
-      const senderData = await getDoc(senderRef);
+      const mentorsRef = [];
+      for (const memberRef of groupData.data().users) {
+        const memberData = await getDoc(memberRef);
+        if ((memberData.data().role === "mentor") && (memberData.id !== uid)) {
+          mentorsRef.push(memberRef);
+        }
+      }
+      await notificationsToUsers(mentorsRef, "New Message", `${groupData.data().groupName} - ${senderData.data().name} - ${message}`);
       await notificationsToAdmins("New Message", `${groupData.data().groupName} - ${senderData.data().name} - ${message}`);
-      console.log(dataArray);
+      
       setData(dataArray);
     } else {
       alert("Please type a message");
@@ -322,7 +331,6 @@ function Chat() {
         usersData.push(tempData);
       });
       setUsers(usersData);
-      console.log(usersData);
     });
   }, [groupId, uid]);
 
