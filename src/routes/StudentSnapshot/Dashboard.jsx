@@ -4,7 +4,6 @@ import {doc, query, onSnapshot, collection, where} from "firebase/firestore";
 import Sidebar from "../../components/Sidebar";
 import DisplayElement from "./DisplayElement";
 
-
 function StudentsCompetitions(){
     const [currentStudentData, setCurrentStudentData] = React.useState({});
     const [schools, setSchools] = React.useState([]);
@@ -258,6 +257,7 @@ function StudentsCompetitions(){
                             competitions={currentStudentData.competitions}
                             courses={currentStudentData.courses}
                             studentId={currentStudentData.docId}
+                            uid={uid}
                         /> : ""
                 }
             </div>

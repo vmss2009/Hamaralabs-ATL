@@ -211,6 +211,7 @@ function DisplayElement(props) {
                                     studentId={props.studentId}
                                     status={competition.status}
                                     deleteCompetition={deleteCompetition}
+                                    uid={props.uid}
                                 />
                     );
                 })}
@@ -252,6 +253,7 @@ function DisplayElement(props) {
                             schools={course.schools}
                             status={course.status}
                             deleteCourse={deleteCourse}
+                            uid={props.uid}
                         />
                     );
                 })}
@@ -287,6 +289,7 @@ function DisplayElement(props) {
                         uploadFile={activity.uploadFile}//newline
                         status={activity.status}
                         deleteActivity={deleteActivity}
+                        uid={props.uid}
                     />
                 );
             })}

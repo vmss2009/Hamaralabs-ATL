@@ -96,7 +96,8 @@ function Sidebar() {
                     <div className="subTitle"><li className="nav-item">Contact</li></div>
                     <div className="subContent">
                         <Link to="/chats"><li className="nav-item">Chats</li></Link>
-                        <Link to="/chat-with-admin"><li className="nav-item last-li">Chat with Admin</li></Link>
+                        <Link to="/chat-with-admin"><li className="nav-item">Chat with Admin</li></Link>
+                        <Link to="/notifications"><li className="nav-item last-li">Notifications</li></Link>
                     </div>
                         <br/>
                         {/*<a href="/profile"><li className="nav-item">Your Profile</li></a>*/}

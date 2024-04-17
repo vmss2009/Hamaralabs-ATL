@@ -18,6 +18,7 @@ import MessageComp from "../ChatWithAdmin/MessageComp";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
 import { orderBy } from "lodash";
+import { notificationsToAdmins } from "../../firebase/cloudmessaging";
 
 function Chat() {
   const { groupId } = useParams();
@@ -55,6 +56,8 @@ function Chat() {
     uid = split[0];
   }
 
+  const groupRef = doc(db, "chats", groupId);
+
   async function handleSend() {
     if (fileUpload !== null) {
       setLoadingTrigger(true);
@@ -84,7 +87,7 @@ function Chat() {
         console.log(dataArray.name);
         setMessage("");
         await setDoc(
-          doc(db, "chats", groupId),
+          groupRef,
           {
             messages: dataArray,
           },
@@ -92,6 +95,10 @@ function Chat() {
         );
         setData(dataArray);
       });
+      const groupData = await getDoc(groupRef);
+      const senderRef = doc(db, "atlUsers", uid);
+      const senderData = await getDoc(senderRef);
+      await notificationsToAdmins("New Message", `${groupData.data().groupName} - ${senderData.data().name} - ${message}`);
       document.querySelector("#file").value = "";
       setFilesUpload(null);
       setLoadingTrigger(false);
@@ -107,12 +114,16 @@ function Chat() {
       });
       setMessage("");
       await setDoc(
-        doc(db, "chats", groupId),
+        groupRef,
         {
           messages: dataArray,
         },
         { merge: true }
       );
+      const groupData = await getDoc(groupRef);
+      const senderRef = doc(db, "atlUsers", uid);
+      const senderData = await getDoc(senderRef);
+      await notificationsToAdmins("New Message", `${groupData.data().groupName} - ${senderData.data().name} - ${message}`);
       console.log(dataArray);
       setData(dataArray);
     } else {

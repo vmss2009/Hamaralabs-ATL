@@ -2,6 +2,7 @@ import React from "react";
 import Popup from "../../components/Popup";
 import {getDoc, doc, setDoc} from "firebase/firestore";
 import db, {deleteAssignedTA} from "../../firebase/firestore";
+import { notificationsToAdmins } from "../../firebase/cloudmessaging";
 
 function ReportBox(props) {
     const [displayValue, setDisplayValue] = React.useState("none");
@@ -14,10 +15,17 @@ function ReportBox(props) {
         const docSnap = await getDoc(docRef);
         const d = new Date();
         const currentDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-        const statusData = [...docSnap.data().status, {status: status, modifiedAt: currentDate}]
+        const statusData = [...docSnap.data().status, {status: status, modifiedAt: currentDate}];
         await setDoc(docRef, {
             status: statusData
         }, {merge: true});
+        // <student name> from <student school name> changed status of <TA name>
+        const userDocRef = doc(db, "studentData", props.studentId);
+        const userData = await getDoc(userDocRef);
+        console.log(userData.data());
+        if (status === "TA Completed") {
+            await notificationsToAdmins("TA Completed", `${userData.data().name.firstName} ${userData.data().name.lastName} from ${userData.data().school} changed status of ${props.taName}`);
+        }
         alert("Modified");
         setPopupOpen(false);
     }

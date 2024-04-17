@@ -3,6 +3,7 @@ import {createBrowserRouter} from "react-router-dom";
 import SnapshotTAEditForm from "./routes/StudentSnapshot/TAEdit";
 import SnapshotCompEditForm from "./routes/StudentSnapshot/CompetitionEdit";
 import SnapshotCourseEditForm from "./routes/StudentSnapshot/CoursesEdit";
+import Dashboard from "./routes/Chats/Dashboard";
 
 const Index = React.lazy(() => import("./routes/Index"));
 const Login = React.lazy(() => import("./routes/Login"));
@@ -59,6 +60,8 @@ const UsersChat = React.lazy(() => import("./routes/ChatWithAdmin/Users"));
 const ChatDashboard = React.lazy(() => import("./routes/Chats/Dashboard"));
 const Chat = React.lazy(() => import("./routes/Chats/Chat"));
 
+const Notifications = React.lazy(() => import("./routes/Notifications/Notifications"));
+
 const Page404 = React.lazy(() => import("./routes/404"));
 const Offline = React.lazy(() => import("./routes/Offline"));
 const ForgotPassword = React.lazy(() => import("./routes/ForgotPassword"));
@@ -66,6 +69,7 @@ const ForgotPassword = React.lazy(() => import("./routes/ForgotPassword"));
 const FallBack = React.lazy(() => import("./App").then(module => ({default: module.FallBack})));
 
 const AccessDeterminer = React.lazy(() => import("./AccessDeterminer"));
+const NoAccess = React.lazy(() => import("./NoAccess"));
 
 let encodedAuth = localStorage.getItem("auth");
 
@@ -323,6 +327,10 @@ const Router = createBrowserRouter([
     {
         path: "/chat-with-admin/:userId",
         element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <AdminIndividualChat /> : <UsersChat />) : (<Login />),
+    },
+    {
+        path: "/notifications",
+        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <Notifications /> : <NoAccess name={"Notifications"}/>) : (<Login />),
     },
     {
         path: "/offline",
