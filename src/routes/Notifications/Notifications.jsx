@@ -6,7 +6,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 function Notifications() {
     const [notifications, setNotifications] = useState([]);
     const [displayOption, setDisplayOption] = useState("");
-    const sections = ["TA Completed", "New message"];
+    const sections = ["TA Completed", "New Message"];
     const values = ["TA Completed", "Chats"];
 
     let encodedAuth = localStorage.getItem("auth");
