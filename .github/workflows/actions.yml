@@ -1,60 +1,3 @@
-# name: CI/CD Workflow
-# on: 
-#   push:
-#   pull_request:
-#   workflow_dispatch:
-
-# env:
-#   FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: '20'
-
-#       - name: Determine Environment
-#         id: env
-#         run: |
-#           if [[ "${{ github.event_name }}" == "push" ]]; then
-#             echo "::set-output name=env::development"
-#           elif [[ "${{ github.base_ref }}" == "development" ]]; then
-#             echo "::set-output name=env::development"
-#           elif [[ "${{ github.base_ref }}" == "staging" ]]; then
-#             echo "::set-output name=env::staging"
-#           elif [[ "${{ github.base_ref }}" == "production" ]]; then
-#             echo "::set-output name=env::production"
-#           fi
-
-#       - name: Substitute Environment Variables
-#         run: |
-#           envsubst < .github/workflows/.env > .env
-#           envsubst < .github/workflows/.firebaserc > .firebaserc
-#           echo "$(<.firebaserc)"
-
-#       - name: Install Dependencies
-#         run: npm ci
-
-#       - name: Build
-#         run: npm run build
-
-#       - name: Deploy to Firebase
-#         if: github.event_name == 'workflow_dispatch'
-#         run: |
-#           npm install -g firebase-tools
-#           firebase use --token ${FIREBASE_TOKEN}
-#           if [[ "${{ steps.env.outputs.env }}" == "development" && "${{ github.event_name }}" == "push" ]]; then
-#             firebase hosting:channel:deploy feature-name -e 12h --token ${FIREBASE_TOKEN}
-#           else
-#             firebase deploy --only hosting --token ${FIREBASE_TOKEN}
-#           fi
-
 name: CI/CD Workflow
 
 on:
@@ -91,7 +34,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -132,7 +75,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -172,7 +115,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -213,7 +156,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
