@@ -18,6 +18,8 @@ jobs:
       REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
       REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
       REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+      
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,7 +36,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: CI=false npm i -f
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -58,6 +60,7 @@ jobs:
       REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
       REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
       REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
 
     runs-on: ubuntu-latest
     steps:
@@ -75,7 +78,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: CI=false npm i -f
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -99,6 +102,8 @@ jobs:
       REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
       REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
       REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -115,7 +120,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: CI=false npm i -f
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -140,6 +145,8 @@ jobs:
       REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
       REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
       REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+      
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -156,7 +163,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: CI=false npm i -f
+        run: npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
