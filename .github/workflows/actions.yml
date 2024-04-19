@@ -34,7 +34,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm i -f
+        run: CI=false npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -75,7 +75,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm i -f
+        run: CI=false npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -115,7 +115,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm i -f
+        run: CI=false npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
@@ -156,7 +156,7 @@ jobs:
           envsubst < .github/workflows/.firebaserc > .firebaserc
 
       - name: Install Dependencies
-        run: npm i -f
+        run: CI=false npm i -f
 
       - name: Install firebase-tools globally
         run: npm install -g firebase-tools
