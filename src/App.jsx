@@ -107,7 +107,7 @@ function App() {
     
     console.log(Notification.permission); 
 
-    if ((Notification.permission === "denied" || Notification.permission === "default") && showPopup === true && localStorage.getItem("auth") !== null) {
+    if ((Notification.permission === "denied" || Notification.permission === "default") && showPopup === true && localStorage.getItem("auth") !== null && (role === "admin" || role === "mentor")) {
         return (
             <div 
                 className="popup-container"
