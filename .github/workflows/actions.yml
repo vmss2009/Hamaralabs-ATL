@@ -5,6 +5,7 @@ on:
   pull_request:
     types:
       [closed]
+  workflow_dispatch:
 
 jobs:
   feature-deploy:
@@ -146,7 +147,7 @@ jobs:
       REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
       REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
       CI: ""
-      
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
