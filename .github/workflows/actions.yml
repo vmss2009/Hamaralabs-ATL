@@ -2,6 +2,9 @@ name: CI/CD Workflow
 
 on:
   push:
+  pull_request:
+    types:
+      [closed]
   workflow_dispatch:
 
 jobs:
@@ -48,7 +51,7 @@ jobs:
           firebase hosting:channel:deploy ${{ github.run_id }} -e 12h --token ${{secrets.FIREBASE_TOKEN}}
 
   development-deploy:
-    if: github.base_ref == 'development'
+    if: github.event_name != 'push' && github.base_ref == 'development'
     environment: development
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
@@ -90,7 +93,7 @@ jobs:
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
 
   staging-deploy:
-    if: github.base_ref == 'staging'
+    if: github.event_name != 'push' && github.base_ref == 'staging'
     environment: staging
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
@@ -133,7 +136,7 @@ jobs:
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
 
   production-deploy:
-    if: github.base_ref == 'production'
+    if: github.event_name != 'push' && github.base_ref == 'production'
     environment: production
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
