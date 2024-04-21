@@ -134,7 +134,7 @@ jobs:
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
 
   production-deploy:
-    if: github.base_ref == 'production'
+    if: github.base_ref == 'main'
     environment: production
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
