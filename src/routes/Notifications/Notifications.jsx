@@ -21,6 +21,7 @@ function Notifications() {
             const notificationsDoc = await getDoc(userDoc);
             const notificationsData = notificationsDoc.data().notifications;
             const notificationsArray = [];
+            console.log(notificationsDoc.data());
             if (displayOption !== "") {
                 notificationsData.forEach((notification, index) => {
                     if (notification.title === displayOption) {
