@@ -5,7 +5,6 @@ on:
   pull_request:
     types:
       [closed]
-  workflow_dispatch:
 
 jobs:
   feature-deploy:
@@ -130,7 +129,6 @@ jobs:
         run: npm run build
 
       - name: Deploy to Firebase
-        if: github.event_name == 'workflow_dispatch'
         run: |
           firebase use --token ${{secrets.FIREBASE_TOKEN}}
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
@@ -173,7 +171,6 @@ jobs:
         run: npm run build
 
       - name: Deploy to Firebase
-        if: github.event_name == 'workflow_dispatch'
         run: |
           firebase use --token ${{secrets.FIREBASE_TOKEN}}
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
