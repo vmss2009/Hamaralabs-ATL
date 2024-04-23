@@ -2,10 +2,13 @@ import React from "react";
 import {Bars} from "react-loader-spinner";
 import readXlsxFile from "read-excel-file";
 import lodash from "lodash";
-
+import {getDownloadURL, getStorage, ref, uploadBytes, listAll, deleteObject} from "firebase/storage";//newline
 import {addActivity, getSubjects, getTopics, getSubtopics} from "../../firebase/firestore";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
+import fbApp from "../../firebase/app";//newline
+
+const storage = getStorage(fbApp);//newline
 
 function TinkeringActivityForm() {
     const [taID, setTAID] = React.useState("");
@@ -57,10 +60,18 @@ function TinkeringActivityForm() {
         setResourcesCount(0);
     }
 
-    function hasDuplicates(array) {
+    function hasDuplicates(array, hasFiles) {
+        if (hasFiles === undefined) {
+            hasFiles = false;
+        }
         var valuesSoFar = Object.create(null);
         for (var i = 0; i < array.length; ++i) {
             var value = array[i];
+            if (hasFiles === true) {
+                if (typeof value === "object") {
+                    value = value.name;
+                }
+            }
             if (value in valuesSoFar) {
                 return true;
             }
@@ -87,9 +98,14 @@ function TinkeringActivityForm() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(observation) || hasDuplicates(extensions) || hasDuplicates(resources)) {
+        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(observation) || hasDuplicates(extensions) || hasDuplicates(resources, true)) {
             alert("Data has duplicate values!");
         } else {
+            for (let index = 0; index < resources.length; index++) {
+                if (typeof resources[index] === "object") {
+                    resources[index] = await uploadFile(resources[index]);
+                }
+            }
             await addActivity(taID, taName, subject, topic, subTopic, intro, goals, materials, instructions, tips, observation, extensions, resources)
                 .then(() => {
                     alert("Added successfully!!");
@@ -277,13 +293,45 @@ function TinkeringActivityForm() {
         extensions[index] = event.target.value;
     }
 
-    function mfHandleChangeResources(event) {
-        const index = Number(event.target.getAttribute("id").replace("resource", ""));
-        resources[index] = event.target.value;
+    function mfHandleChangeResources(event, file) {
+        const index = Number(event.target.getAttribute("id").replace(file ? "uploadMou" : "resource", ""));
+        if (file) {
+            resources[index] = file;
+            setResourcesCount(resourcesCount+1);
+            resources[resourcesCount] = "";
+        } else {
+            resources[index] = event.target.value;
+        }
     }
+
+    async function uploadFile(file) {
+        try {
+            const filesFolderRef = ref(storage, `tAFiles/${taName}/${file.name}`);
+            const temp2 = await uploadBytes(filesFolderRef, file);
+            const temp = await getDownloadURL(filesFolderRef);
+            console.log(temp2);
+            return temp;
+        } catch (error){
+            console.log(error);
+        }
+    }
+
 
     function onFileSelect(event) {
         setFile(event.target.files[0]);
+    }
+
+    async function onFileSelectResources(event) {
+        event.preventDefault();
+        const selectedFile = event.target.files[0];
+        const fileSizeInMB = selectedFile.size / (1024*1024);
+        
+        if (selectedFile && fileSizeInMB <= 50) {
+            mfHandleChangeResources(event, selectedFile);
+        } else {
+            alert("Please select a file less than 50MB");
+            console.log(resources);
+        }
     }
 
     async function addFromXlsx(event) {
@@ -553,8 +601,16 @@ function TinkeringActivityForm() {
                     <div className="multiForm">
                         {
                             createArray(resourcesCount).map((_, index) => {
+                                console.log(resources[index]);
                                 return <div key={index}>
-                                    <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    {typeof resources[index] === "undefined" 
+                                    ? <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    : <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" readOnly={typeof resources[index] === "string" ? false : true} value={typeof resources[index] === "string" ? resources[index] : resources[index].name} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    } 
+                                    <label htmlFor={"uploadMou"+index} className="resetbutton">
+                                        <i className="fa-solid fa-upload"></i>
+                                    </label>
+                                    <input type="file" name={"uploadMou"+index} id={"uploadMou"+index} style={{display: "none"}} onChange={onFileSelectResources}/>
                                     <br/>
                                 </div>
                             })

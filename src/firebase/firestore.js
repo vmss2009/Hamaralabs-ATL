@@ -398,6 +398,7 @@ async function addSession(sessionTutor, sessionType, sessionDate, sessionTime,  
 
 async function addActivity(taID, taName, subject, topic, subTopic, intro, goals, materials, instructions, tips, assessment, extensions, resources) {
     const docRef = doc(db, activityPath, taID);
+
     await setDoc(docRef, {
         taID: taID,
         taName: taName,
@@ -411,7 +412,7 @@ async function addActivity(taID, taName, subject, topic, subTopic, intro, goals,
         tips: tips,
         assessment: assessment,
         extensions: extensions,
-        resources: resources,
+        resources: resources
     });
 }
 
