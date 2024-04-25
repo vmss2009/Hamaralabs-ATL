@@ -277,16 +277,6 @@ function SnapshotTAEditForm() {
         }
     }
 
-    // async function onFileSelect(event) {
-    //     event.preventDefault();
-    //     const selectedFile = event.target.files[0];
-        
-    //     if (selectedFile) {
-    //         setFile(selectedFile);
-    //         setFileChanged(true);
-    //     }
-    // }
-
     function getFileNameFromUrl(url, operation) {
         const urlObj = new URL(url);
         const pathSegments = urlObj.pathname.split('/');
