@@ -171,7 +171,7 @@ function ReportBox(props) {
                 files !== undefined && files.length > 0 ?
                 <div className="boxContainer"><span style={{fontWeight: "600"}}>Files:</span> <br/> {
                     files.map((file, index) => {
-                        return <span key={index}>{index+1}. {getFileNameFromUrl(file, props.taName)} <br/></span>
+                        return <span key={index}>{index+1}. <a href={file} target="_blank" rel="noreferrer">{getFileNameFromUrl(file, props.taName)}</a> <br/></span>
                     })
                 }
                 </div>
