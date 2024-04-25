@@ -458,11 +458,10 @@ async function updateTActivity(taID, taName, intro, goals, materials, instructio
         extensions: extensions,
         resources: resources,
         comment: comment === undefined ? "" : comment,
+        files: uploadURL.length > 0 ? uploadURL : []
     }
 
-    if (uploadURL !== "") {
-        data.uploadFile = uploadURL;
-    }
+    console.log(data);
 
     await updateDoc(docRef, data);
 }
