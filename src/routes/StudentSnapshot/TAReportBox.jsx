@@ -9,6 +9,16 @@ function ReportBox(props) {
 
     const [status, setStatus] = React.useState(props.status[props.status.length-1]);
     const [popupOpen, setPopupOpen] = React.useState(false);
+    const files = props.uploadFile;
+
+    function getFileNameFromUrl(url, operation) {
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/');
+        const encodedFileName = pathSegments[pathSegments.length - 1];
+        let fileName = decodeURIComponent(encodedFileName);
+        fileName = fileName.replace(`tAFiles/${operation}/`, '');
+        return fileName;
+    }
 
     async function modifyStatus(event) {
         const docRef = doc(db, "studentData", props.studentId, "taData", props.taID);
@@ -56,7 +66,8 @@ function ReportBox(props) {
         window.location.href = "/student-data/snapshot/"+props.studentId+"/ta/edit/"+props.taID;
     }
 
-    
+
+
     const role = atob(localStorage.getItem("auth")).split("-")[2];
 
     return (// need lighter green
@@ -155,7 +166,17 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Comments:  </span>{props.comment}</div>
             <br/>
-            {props.uploadFile?<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span><a href={props.uploadFile} target="_blank" rel="noreferrer">Click here to open</a></div>:<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span>None</div>}
+            {/* {props.uploadFile?<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span><a href={props.uploadFile} target="_blank" rel="noreferrer">Click here to open</a></div>:<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span>None</div>} */}
+            {
+                files !== undefined && files.length > 0 ?
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Files:</span> <br/> {
+                    files.map((file, index) => {
+                        return <span key={index}>{index+1}. {getFileNameFromUrl(file, props.taName)} <br/></span>
+                    })
+                }
+                </div>
+                : ""
+            }
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Status Tracking:</span> <br/> {
                 props.status.map((eachStatus, index) => {
