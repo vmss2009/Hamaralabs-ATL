@@ -513,7 +513,7 @@ function SnapshotTAEditForm() {
                     <input type="file" name="uploadMou" id="uploadMou" ref={fileInput} onChange={handleFileSelect} multiple style={{ display: "none" }} />
                     {files.map((file, index) => (
                         <div key={index}>
-                        <span> <b>{index+1}.</b> {isValidUrl(file) ? getFileNameFromUrl(file, taNamePermanent) : file.name}</span>
+                        <span> <b>{index+1}.</b> {isValidUrl(file) ? <a href={file} target="_blank" rel="noreferrer">{getFileNameFromUrl(file, taNamePermanent)}</a> : file.name}</span>
                         <button onClick={(event) => {
                             event.preventDefault();
                             handleFileRemove(index)
