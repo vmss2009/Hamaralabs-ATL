@@ -53,6 +53,24 @@ function ReportBox(props) {
         window.location.href="/ta-data/edit/"+props.docId;
     }
 
+    function getFileNameFromUrl(url, operation) {
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/');
+        const encodedFileName = pathSegments[pathSegments.length - 1];
+        let fileName = decodeURIComponent(encodedFileName);
+        fileName = fileName.replace(`tAFiles/${operation}/`, '');
+        return fileName;
+    }
+
+    function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (err) {
+          return false;
+        }
+    }
+
     // async function handleAssignTo(event) {
     //     const docRef = doc(db, "taData", props.docId);
     //     const taData = await getDoc(docRef);
@@ -233,7 +251,7 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Resources:</span> <br/> {
                 props.resources.map((resource, index) => {
-                    return <span key={index}>{index+1}. {resource} <br/></span>
+                    return <span key={index}>{index+1}. {isValidUrl(resource) ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : resource} <br/></span>
                 })
             }
             </div>
