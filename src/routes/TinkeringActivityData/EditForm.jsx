@@ -14,6 +14,7 @@ function TinkeringActivityForm() {
 
     const [taID, setTAID] = React.useState("");
     const [taName, setTAName] = React.useState("");
+    const [taNamePermanent, setTaNamePermanent] = React.useState("");
     const [subject, setSubject] = React.useState("");
     const [subjectID, setSubjectID] = React.useState("");
     const [topic, setTopic] = React.useState("");
@@ -39,6 +40,15 @@ function TinkeringActivityForm() {
     const [resourcesCount, setResourcesCount] = React.useState(0);
 
     function clearForm() {
+    }
+
+    function getFileNameFromUrl(url, operation) {
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/');
+        const encodedFileName = pathSegments[pathSegments.length - 1];
+        let fileName = decodeURIComponent(encodedFileName);
+        fileName = fileName.replace(`tAFiles/${operation}/`, '');
+        return fileName;
     }
 
     function hasDuplicates(array, hasFiles) {
@@ -276,6 +286,7 @@ function TinkeringActivityForm() {
         onSnapshot(q, (snapshot) => {
             setTAID(snapshot.data().taID);
             setTAName(snapshot.data().taName);
+            setTaNamePermanent(snapshot.data().taName);
             setSubject(snapshot.data().subject ? snapshot.data().subject : "");
             setTopic(snapshot.data().topic ? snapshot.data().topic : "");
             setSubTopic(snapshot.data().subTopic ? snapshot.data().subTopic : "");
@@ -558,10 +569,19 @@ function TinkeringActivityForm() {
                     <div className="multiForm">
                         {
                             createArray(resourcesCount).map((_, index) => {
+                                if (resources[index] === undefined) {
+                                    resources[index] = "";
+                                }
                                 return <div key={index}>
                                     {typeof resources[index] === "undefined"
                                     ? <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" value={resources[index]} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
-                                    : <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" readOnly={typeof resources[index] === "string" ? (resources[index].startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-dev.appspot.com/o/") === true ? true : false) : true} value={typeof resources[index] === "string" ? resources[index] : resources[index].name} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    : (typeof resources[index] === "string" && resources[index].startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-dev.appspot.com/o/") ? 
+                                    <div 
+                                    type="text"
+                                    className="form-inp" 
+                                    style={{marginTop: "1rem", lineHeight: "1.5", padding: "10px", overflowWrap: "break-word"}}
+                                    ><a href={resources[index]} target="_blank" rel="noreferrer">{getFileNameFromUrl(resources[index], taNamePermanent)}</a>
+                                    </div> :<textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" readOnly={typeof resources[index] === "string" ? false : true} value={typeof resources[index] === "string" ? resources[index] : resources[index].name} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>)
                                     }
                                     <label htmlFor={"uploadMou"+index} className="resetbutton">
                                         <i className="fa-solid fa-upload"></i>

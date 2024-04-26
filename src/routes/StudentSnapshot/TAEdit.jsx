@@ -293,7 +293,7 @@ function SnapshotTAEditForm() {
         } catch (err) {
           return false;
         }
-      }
+    }
 
     const handleFileSelect = (event) => {
         setFileChanged(true);
