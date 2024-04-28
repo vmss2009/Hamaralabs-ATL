@@ -14,6 +14,7 @@ function SnapshotTAEditForm() {
 
     const [taID, setTAID] = React.useState("");
     const [taName, setTAName] = React.useState("");
+    const [taNamePermanent, setTaNamePermanent] = React.useState("");
     const [intro, setIntro] = React.useState("");
     const [goals, setGoals] = React.useState([]);
     const [materials, setMaterials] = React.useState([]);
@@ -32,17 +33,25 @@ function SnapshotTAEditForm() {
     const [resourcesCount, setResourcesCount] = React.useState(0);
     const [comment, setComment] = React.useState("");//newline
 
-    const [file, setFile] = React.useState(null);//newline
-    const [fileURL, setFileURL] = React.useState("");//newline
-    const [fileChanged, setFileChanged] = React.useState(false);//newline
+    const fileInput = React.useRef(null);
+    const [files, setFiles] = React.useState([]);
+    const [fileChanged, setFileChanged] = React.useState(false);
 
     function clearForm() {
     }
 
-    function hasDuplicates(array) {
+    function hasDuplicates(array, hasFiles) {
+        if (hasFiles === undefined) {
+            hasFiles = false;
+        }
         var valuesSoFar = Object.create(null);
         for (var i = 0; i < array.length; ++i) {
             var value = array[i];
+            if (hasFiles === true) {
+                if (typeof value === "object") {
+                    value = value.name;
+                }
+            }
             if (value in valuesSoFar) {
                 return true;
             }
@@ -65,40 +74,34 @@ function SnapshotTAEditForm() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(assessment) || hasDuplicates(extensions) || hasDuplicates(resources)) {
+        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(assessment) || hasDuplicates(extensions) || hasDuplicates(resources, true)) {
             alert("Data has duplicate values!");
         } else {
-
-            if(fileChanged) {
-                const stRef = ref(storage, "tAFiles/"+taName);
-                await listAll(stRef)
-                    .then(res => {
-                        res.items.forEach(async itemRef => {
-                            await deleteObject(itemRef)
-                        })
+            for (let index = 0; index < resources.length; index++) {
+                if (typeof resources[index] === "object") {
+                    resources[index] = await uploadFileResources(resources[index]);
+                }
+            }
+            const stRef = ref(storage, "tAFiles/"+taName);
+            await listAll(stRef)
+                .then(res => {
+                    res.items.forEach(async itemRef => {
+                        await deleteObject(itemRef)
                     })
+                })
                 const tURL = await uploadFile();
-                    await updateTActivity (taID, taName, intro, goals, materials, instructions, tips, assessment, extensions, resources,comment, tURL, doc(db, "studentData", studentId, "taData", activityId))
-                    .then(() => {
-                        alert("Updated successfully!!");
-                        window.location.href = "/";
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        alert("Updating data failed! Please try again.");
-                    });
-            } else {
-            await updateTActivity(taID, taName, intro, goals, materials, instructions, tips, assessment, extensions, resources, comment, "", doc(db, "studentData", studentId, "taData", activityId))
+                console.log(tURL);
+                await updateTActivity (taID, taName, intro, goals, materials, instructions, tips, assessment, extensions, resources,comment, tURL, doc(db, "studentData", studentId, "taData", activityId))
                 .then(() => {
                     alert("Updated successfully!!");
                     window.location.href = "/";
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.log(error);
                     alert("Updating data failed! Please try again.");
                 });
         }
     }
-}
 
     function handleClick(event) {
         if(event.target.type === "reset") {
@@ -217,14 +220,39 @@ function SnapshotTAEditForm() {
         setExtensions(temp);
     }
 
-    function mfHandleChangeResources(event) {
-        const index = Number(event.target.getAttribute("id").replace("resource", ""));
+    function mfHandleChangeResources(event, file) {
+        const index = Number(event.target.getAttribute("id").replace(file ? "uploadMou" : "resource", ""));
         const temp = [...resources];
-        temp[index] = event.target.value;
+        if (file) {
+            temp[index] = file;
+            setResourcesCount(resourcesCount+1);
+            console.log(resourcesCount);
+            temp[resourcesCount] = "";
+        } else {
+            temp[index] = event.target.value;
+        }
         setResources(temp);
     }
 
     async function uploadFile() {
+        try {
+            const urls = files;
+            for (let i = 0; i < files.length; i++) {
+                if (typeof files[i] === "object") {
+                    const filesFolderRef = ref(storage, `tAFiles/${taName}/${files[i].name}`);
+                    const temp2 = await uploadBytes(filesFolderRef, files[i]);
+                    const temp = await getDownloadURL(filesFolderRef);
+                    urls[i] = temp;
+                    console.log(temp2);
+                }
+            }
+            return urls;
+        } catch (error){
+            console.log(error);
+        }
+    }
+
+    async function uploadFileResources(file) {
         try {
             const filesFolderRef = ref(storage, `tAFiles/${taName}/${file.name}`);
             const temp2 = await uploadBytes(filesFolderRef, file);
@@ -236,27 +264,52 @@ function SnapshotTAEditForm() {
         }
     }
 
-    /*function onFileSelect(event) {
-        event.preventDefault();
-        setFile(event.target.files[0]);
-        setFileChanged(true);
-    }*/
-
-    async function onFileSelect(event) {
+    async function onFileSelectResources(event) {
         event.preventDefault();
         const selectedFile = event.target.files[0];
+        const fileSizeInMB = selectedFile.size / (1024*1024);
         
-        if (selectedFile) {
-            setFile(selectedFile);
-            setFileChanged(true);
+        if (selectedFile && fileSizeInMB <= 50) {
+            mfHandleChangeResources(event, selectedFile);
+        } else {
+            alert("Please select a file less than 50MB");
+            console.log(resources);
         }
     }
+
+    function getFileNameFromUrl(url, operation) {
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/');
+        const encodedFileName = pathSegments[pathSegments.length - 1];
+        let fileName = decodeURIComponent(encodedFileName);
+        fileName = fileName.replace(`tAFiles/${operation}/`, '');
+        return fileName;
+    }
     
+    function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (err) {
+          return false;
+        }
+    }
+
+    const handleFileSelect = (event) => {
+        setFileChanged(true);
+        console.log(files);
+        setFiles([...files, ...event.target.files]);
+    };
+    
+    const handleFileRemove = (index) => {
+        setFiles(files.filter((_, i) => i !== index));
+    };
 
     React.useEffect(() => {
         const q = query(doc(db, "studentData", studentId, "taData", activityId));
         onSnapshot(q, (snapshot) => {
             setTAID(snapshot.data().taID);
+            setTaNamePermanent(snapshot.data().taName);
             setTAName(snapshot.data().taName);
             setIntro(snapshot.data().intro);
             setAssessment(snapshot.data().assessment);
@@ -274,7 +327,7 @@ function SnapshotTAEditForm() {
             setTips(snapshot.data().tips);
             setTipsCount(snapshot.data().tips.length);
             setComment(snapshot.data().comment);
-            setFileURL(snapshot.data().uploadFile);
+            setFiles(snapshot.data().files === (undefined) ? [] : snapshot.data().files);
         });
     }, []);
 
@@ -423,7 +476,14 @@ function SnapshotTAEditForm() {
                         {
                             createArray(resourcesCount).map((_, index) => {
                                 return <div key={index}>
-                                    <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" className="form-inp" value={resources[index]} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    {typeof resources[index] === "undefined"
+                                    ? <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" value={resources[index]} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    : <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" readOnly={typeof resources[index] === "string" ? (resources[index].startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-dev.appspot.com/o/") === true ? true : false) : true} value={typeof resources[index] === "string" ? resources[index] : resources[index].name} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    }
+                                    <label htmlFor={"uploadMou"+index} className="resetbutton">
+                                        <i className="fa-solid fa-upload"></i>
+                                    </label>
+                                    <input type="file" name={"uploadMou"+index} id={"uploadMou"+index} style={{display: "none"}} onChange={onFileSelectResources}/>
                                     <br/>
                                 </div>
                             })
@@ -442,18 +502,25 @@ function SnapshotTAEditForm() {
                 </div>
                 <div className="formContainer">
                     <label><strong>Upload File:</strong> </label>
-                    <label htmlFor="uploadMou" className="resetbutton">
+                    <label htmlFor="uploadMou" className="resetbutton" onClick={(event) => {
+                        event.preventDefault();
+                        fileInput.current.click();
+                    }}>
                         <i className="fa-solid fa-upload"></i>
                     </label>
                     <br/>
                     <br/>
-                    <input type="file" name="uploadMou" id="uploadMou" onChange={onFileSelect} style={{ display: "none" }} />
-
-                    {
-                        file !== null ?
-                            <div>File Selected: {file.name}</div> : ""
-                    }
-                    <div>Current File: {fileURL === "" ? "None" : <a href={fileURL} target="_blank" rel="noreferrer">Click here to open</a>}</div>
+                    <input type="file" name="uploadMou" id="uploadMou" ref={fileInput} onChange={handleFileSelect} multiple style={{ display: "none" }} />
+                    {files.map((file, index) => (
+                        <div key={index}>
+                        <span> <b>{index+1}.</b> {isValidUrl(file) ? <a href={file} target="_blank" rel="noreferrer">{getFileNameFromUrl(file, taNamePermanent)}</a> : file.name}</span>
+                        <button onClick={(event) => {
+                            event.preventDefault();
+                            handleFileRemove(index)
+                        }}><i class="fa-solid fa-circle-xmark" style={{cursor: "pointer"}}></i>
+                        </button>
+                        </div>
+                    ))}
                 </div>
                 <div className="buttonsContainer formContainer">
                     <button type="submit" className="submitbutton" onClick={handleSubmit}>Update</button>

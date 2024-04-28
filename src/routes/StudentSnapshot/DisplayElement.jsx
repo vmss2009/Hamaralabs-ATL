@@ -286,7 +286,7 @@ function DisplayElement(props) {
                         assessment={activity.assessment}
                         comment={activity.comment}//newline
                         studentId={props.studentId}
-                        uploadFile={activity.uploadFile}//newline
+                        uploadFile={activity.files}//newline
                         status={activity.status}
                         deleteActivity={deleteActivity}
                         uid={props.uid}
