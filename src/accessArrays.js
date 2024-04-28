@@ -14,7 +14,7 @@ const activityForm = ["admin", "atlIncharge", "mentor"];
 const activityReport = ["admin", "atlIncharge", "mentor", "student"];
 
 const competitionForm = ["admin"];
-const competitionReport = ["admin", "atlIncharge"];
+const competitionReport = ["admin", "atlIncharge", "student", "mentor"];
 const competitionArchived = ["admin"];
 const competitionSnapshot = ["admin", "atlIncharge", "student", "mentor"];
 
