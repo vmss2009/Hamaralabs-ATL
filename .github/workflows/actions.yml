@@ -5,6 +5,8 @@ on:
     branches:
       - 'feature/*'
   pull_request:
+    types:
+      [closed]
 
 jobs:
   feature-deploy:
@@ -50,7 +52,7 @@ jobs:
           firebase hosting:channel:deploy ${{ github.run_id }} -e 12h --token ${{secrets.FIREBASE_TOKEN}}
 
   development-deploy:
-    if: github.base_ref == 'development'
+    if: github.base_ref == 'development' && github.event.pull_request.merged == true
     environment: development
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
@@ -92,7 +94,7 @@ jobs:
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
 
   staging-deploy:
-    if: github.base_ref == 'staging'
+    if: github.base_ref == 'staging' && github.event.pull_request.merged == true
     environment: staging
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
@@ -134,7 +136,7 @@ jobs:
           firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
 
   production-deploy:
-    if: github.base_ref == 'main'
+    if: github.base_ref == 'main' && github.event.pull_request.merged == true
     environment: production
     env:
       REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
