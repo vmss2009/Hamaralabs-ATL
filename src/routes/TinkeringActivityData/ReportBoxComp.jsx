@@ -7,7 +7,6 @@ const Popup = React.lazy(() => import("../../components/Popup"));
 
 function ReportBox(props) {
     const role = atob(localStorage.auth).split("-")[2];
-    console.log(role);
     const [displayValue, setDisplayValue] = React.useState("none");
     const students = props.students;
     const schools = props.schools;
@@ -256,13 +255,13 @@ function ReportBox(props) {
             }
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
-                <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                 {
-                    atob(localStorage.auth).split("-")[2] === "admin" ?
-                <>
-                <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
-                <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
-                </>: ""
+                    role === "admin" ?
+                    <>
+                    <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                    <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
+                    <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
+                    </>: ""
                 }
             </div>
         </div>
