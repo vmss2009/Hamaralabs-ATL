@@ -1,15 +1,17 @@
 import React from "react";
-import {doc, query, onSnapshot, addDoc, collection, setDoc} from "firebase/firestore";
+import {doc, query, onSnapshot, addDoc, collection, setDoc, where, getDocs} from "firebase/firestore";
 
 import {db} from "../../firebase/firestore";
 import Sidebar from "../../components/Sidebar";
 
 function Dashboard() {
     const [userData, setUserData] = React.useState({});
+    const [inchargeUIDs, setInchargeUIDs] = React.useState([]);
 
     let encodedAuth = localStorage.getItem("auth");
 
     let uid;
+    let email;
 
     if (encodedAuth != null) {
         let decodedAuth = atob(encodedAuth);
@@ -17,6 +19,7 @@ function Dashboard() {
         let split = decodedAuth.split("-");
 
         uid = split[0];
+        email = split[1];
     }
 
     async function createNewGroup(event) {
@@ -26,12 +29,36 @@ function Dashboard() {
         }
         if(groupName !== null) {
             const docRef = collection(db, "chats");
-            const docSnap = await addDoc(docRef, {
+            const studentQuery = query(collection(db, "studentData"), where("email", "==", email)); 
+            const dataArray = [];
+            onSnapshot(studentQuery, (querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const schoolQuery = query(collection(db, "schoolData"), where("name", "==", doc.data().school));
+                    onSnapshot(schoolQuery, (schoolQuerySnapshot) => {
+                        schoolQuerySnapshot.forEach((schoolDoc) => {
+                            const q = query(collection(db, "atlUsers"), where("email", "==", schoolDoc.data().atlIncharge.email));
+                            onSnapshot(q, (querySnapshot) => {
+                                querySnapshot.forEach((val) => {
+                                    console.log(val.data().uid);
+                                    dataArray.push(val.data().uid);
+                                    setInchargeUIDs([...inchargeUIDs, val.data().uid]);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+            const uids = [...new Set(inchargeUIDs)];
+
+            const data = {
                 users: [
-                    doc(db, "atlUsers", uid)
+                    doc(db, "atlUsers", uid),
+                    ...uids.map((val) => doc(db, "atlUsers", val))
                 ],
                 groupName: groupName
-            });
+            }
+            const docSnap = await addDoc(docRef, data);
             const userDocRef = doc(db, "atlUsers", uid);
             if(userData.chats === undefined) {
                 await setDoc(userDocRef, {
