@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {doc, query, onSnapshot, addDoc, collection, setDoc, where, getDocs} from "firebase/firestore";
 
 import {db} from "../../firebase/firestore";
@@ -6,7 +6,6 @@ import Sidebar from "../../components/Sidebar";
 
 function Dashboard() {
     const [userData, setUserData] = React.useState({});
-    const [inchargeUIDs, setInchargeUIDs] = React.useState([]);
 
     let encodedAuth = localStorage.getItem("auth");
 
@@ -21,6 +20,28 @@ function Dashboard() {
         uid = split[0];
         email = split[1];
     }
+    
+    async function getInchargeUIDs() {
+        const dataArray = [];
+        const studentQuery = query(collection(db, "studentData"), where("email", "==", email)); 
+        const querySnapshot = await getDocs(studentQuery);
+        
+        for (const doc of querySnapshot.docs) {
+          const schoolQuery = query(collection(db, "schoolData"), where("name", "==", doc.data().school));
+          const schoolQuerySnapshot = await getDocs(schoolQuery);
+          
+          for (const schoolDoc of schoolQuerySnapshot.docs) {
+            const q = query(collection(db, "atlUsers"), where("email", "==", schoolDoc.data().atlIncharge.email));
+            const userQuerySnapshot = await getDocs(q);
+            
+            for (const val of userQuerySnapshot.docs) {
+              console.log(val.data().uid);
+              dataArray.push(val.data().uid);
+            }
+          }
+        }
+        return dataArray;
+    }
 
     async function createNewGroup(event) {
         let groupName = "";
@@ -29,25 +50,8 @@ function Dashboard() {
         }
         if(groupName !== null) {
             const docRef = collection(db, "chats");
-            const studentQuery = query(collection(db, "studentData"), where("email", "==", email)); 
-            const dataArray = [];
-            onSnapshot(studentQuery, (querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    const schoolQuery = query(collection(db, "schoolData"), where("name", "==", doc.data().school));
-                    onSnapshot(schoolQuery, (schoolQuerySnapshot) => {
-                        schoolQuerySnapshot.forEach((schoolDoc) => {
-                            const q = query(collection(db, "atlUsers"), where("email", "==", schoolDoc.data().atlIncharge.email));
-                            onSnapshot(q, (querySnapshot) => {
-                                querySnapshot.forEach((val) => {
-                                    console.log(val.data().uid);
-                                    dataArray.push(val.data().uid);
-                                    setInchargeUIDs([...inchargeUIDs, val.data().uid]);
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            
+            const inchargeUIDs = await getInchargeUIDs();
 
             const uids = [...new Set(inchargeUIDs)];
 
@@ -58,6 +62,7 @@ function Dashboard() {
                 ],
                 groupName: groupName
             }
+
             const docSnap = await addDoc(docRef, data);
             const userDocRef = doc(db, "atlUsers", uid);
             if(userData.chats === undefined) {
