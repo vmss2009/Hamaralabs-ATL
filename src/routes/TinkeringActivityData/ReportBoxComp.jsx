@@ -1,13 +1,13 @@
 import React from "react";
 import {doc, getDoc, setDoc} from "firebase/firestore";
-import db from "../../firebase/firestore";
+import db, {addActivity} from "../../firebase/firestore";
 import Select from 'react-select';
+import lodash from "lodash";
 
 const Popup = React.lazy(() => import("../../components/Popup"));
 
 function ReportBox(props) {
     const role = atob(localStorage.auth).split("-")[2];
-    console.log(role);
     const [displayValue, setDisplayValue] = React.useState("none");
     const students = props.students;
     const schools = props.schools;
@@ -143,6 +143,45 @@ function ReportBox(props) {
     setStudentData(sortedStudents);
     setSelectedOptions([]);
     }, [school])
+
+    async function cloneTA () {
+        const now = Date.now();
+        let temp = "";
+        if (props.subject !== undefined && props.topic !== undefined && props.subTopic !== undefined) {
+            if(props.subject.length !== 0) {
+                temp += lodash.toUpper(props.subject.charAt(0));
+            }
+    
+            if(props.topic.length !== 0) {
+                temp += lodash.toUpper(props.topic.charAt(0));
+            }
+    
+            if(props.subTopic.length !== 0) {    
+                temp += lodash.toUpper(props.subTopic.charAt(0));
+            }
+            temp += now;
+        } else {
+            temp = `TA${now}`;
+        }
+        setUrlParam("activityId", temp);
+        await addActivity(temp, props.taName, props.subject || "", props.topic || "", props.subTopic || "", props.intro, props.goals, props.materials, props.instructions, props.tips, props.assessment, props.extensions, props.resources)
+        .then(() => {
+            alert("Cloned successfully!");
+            window.location.href="/ta-data/edit/" + temp;
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Adding data failed! Please try again.");
+        });
+    }
+
+    const setUrlParam = (paramName, value) => {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set(paramName, value);
+        const newUrl = `${window.location.origin}${window.location.pathname}?${searchParams.toString()}`;
+        window.history.pushState({}, '', newUrl);
+    };
+
     let decodedAuth = atob(localStorage.auth);
 
     let split = decodedAuth.split("-");
@@ -153,7 +192,7 @@ function ReportBox(props) {
 
     return (
         <div className="box" id={props.id} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-             {assignToOpen ? (
+            {assignToOpen ? (
                     <Popup trigger={assignToOpen} setPopupEnabled={setAssignToOpen} closeAllowed={true}>
                         <div className="container" style={{ fontSize: "1.2rem" }}>
                         Assign to School:
@@ -195,6 +234,7 @@ function ReportBox(props) {
                     </Popup>
               )  : ""
             }
+
             <div className="name" onMouseOver={handleMouseOver} style={{fontSize: "1.5rem"}}>{props.taName}</div>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>TA ID:</span> {props.taID}</div>
             <br/>
@@ -256,13 +296,14 @@ function ReportBox(props) {
             }
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
-                <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                 {
-                    atob(localStorage.auth).split("-")[2] === "admin" ?
-                <>
-                <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
-                <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
-                </>: ""
+                    role === "admin" ?
+                    <>
+                    <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
+                    <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                    <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
+                    <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
+                    </>: ""
                 }
             </div>
         </div>

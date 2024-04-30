@@ -17,7 +17,7 @@ import storage from "../../firebase/storage";
 import MessageComp from "../ChatWithAdmin/MessageComp";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
-import { orderBy } from "lodash";
+import { orderBy, set } from "lodash";
 import { notificationsToAdmins, notificationsToUsers } from "../../firebase/cloudmessaging";
 
 function Chat() {
@@ -26,10 +26,12 @@ function Chat() {
   const chatBoxRef = React.useRef(null); // Defining chatBoxRef as null initially
 
   const [popupEnabled, setPopupEnabled] = React.useState(false);
+  const [popupEnabled2, setPopupEnabled2] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [data, setData] = React.useState([]);
   const [users, setUsers] = React.useState([]);
   const [groupName, setGroupName] = React.useState("");
+  const [groupMembers, setGroupMembers] = React.useState([]);
   const [allowedUsers, setAllowedUsers] = React.useState([]);
   const [fileUpload, setFilesUpload] = React.useState(null);
   const [loadingTrigger, setLoadingTrigger] = React.useState(false);
@@ -226,6 +228,10 @@ function Chat() {
     setPopupEnabled(true);
   }
 
+  function openPopUp2 () {
+    setPopupEnabled2(true);
+  }
+
   function handleSelectFiles(event) {
     setFilesUpload(event.target.files);
   }
@@ -310,6 +316,15 @@ function Chat() {
         window.location.href = "/chats";
       } else {
         setGroupName(snapshot.data().groupName);
+        (async() => {
+          const dataArray2 = [];
+          for (let i = 0; i < snapshot.data().users.length; i++) {
+            const data = await getDoc(snapshot.data().users[i]);
+            console.log(data.data());
+            dataArray2.push(data.data());
+          }
+          setGroupMembers(dataArray2);
+        })()
         if ((snapshot.data().messages === null) || (snapshot.data().messages === undefined)) {
           setMessage("");
         } else {
@@ -385,6 +400,23 @@ function Chat() {
         </button>
       </Popup>
       <Popup
+        trigger={popupEnabled2}
+        setPopupEnabled={setPopupEnabled2}
+        closeAllowed={true}
+        width="30%"
+        height="30%"
+      >
+        <hr />
+        <h2 className="subtitle">Members</h2>
+        <ul className="members-list">
+          {groupMembers.map((member, index) => (
+            <li key={index} className="member-item">
+              <h3 className="member-name">{member.name} - {member.role}</h3>
+            </li>
+          ))}
+        </ul>
+      </Popup>
+      <Popup
         trigger={loadingTrigger}
         setPopupEnabled={setLoadingTrigger}
         closeAllowed={false}
@@ -404,6 +436,13 @@ function Chat() {
       <div style={{ height: "10vh" }}>
         <h1 className="title">Chat {groupName} | Digital ATL</h1>
         <hr />
+        <button
+          className="resetbutton"
+          style={{ position: "fixed", top: "0", right: "6.5rem" }}
+          onClick={openPopUp2}
+        >
+          <i class="fa-solid fa-eye"></i>
+        </button>
         <button
           className="resetbutton"
           style={{ position: "fixed", top: "0", right: "1.5rem" }}
