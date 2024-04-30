@@ -403,14 +403,15 @@ function Chat() {
         trigger={popupEnabled2}
         setPopupEnabled={setPopupEnabled2}
         closeAllowed={true}
+        width="30%"
+        height="30%"
       >
         <hr />
         <h2 className="subtitle">Members</h2>
         <ul className="members-list">
           {groupMembers.map((member, index) => (
             <li key={index} className="member-item">
-              <h3 className="member-name">{member.name}</h3>
-              <p className="member-email">{member.email}</p>
+              <h3 className="member-name">{member.name} - {member.role}</h3>
             </li>
           ))}
         </ul>
