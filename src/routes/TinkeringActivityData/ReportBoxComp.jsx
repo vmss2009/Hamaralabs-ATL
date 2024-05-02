@@ -1,8 +1,10 @@
 import React from "react";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import db, {addActivity} from "../../firebase/firestore";
+import axios from "axios";
 import Select from 'react-select';
 import lodash from "lodash";
+import { Bars } from "react-loader-spinner";
 
 const Popup = React.lazy(() => import("../../components/Popup"));
 
@@ -175,6 +177,21 @@ function ReportBox(props) {
         });
     }
 
+    async function generateTA() {
+        props.setLoading(true);
+        const response = await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/tinkeringActivityAI/generate", {"inputText": "Only give me the JSON without any extra letters !!!. Just give me the object !!. No other extra word. Give me the next best tinkering activity for the given TA" + JSON.stringify(props.activity)});
+        const axiosResponse = response.data;
+        const responseText = axiosResponse.response.response.candidates[0].content.parts[0].text;
+        console.log(responseText);
+        const newTA = JSON.parse(responseText.replace(/\n/g, ''));
+        console.log(newTA);
+        const docRef = doc(db, "taData", newTA.taID);
+
+        await setDoc(docRef, newTA);
+        props.setLoading(false);
+        window.location.reload();
+    }
+
     const setUrlParam = (paramName, value) => {
         const searchParams = new URLSearchParams(window.location.search);
         searchParams.set(paramName, value);
@@ -299,6 +316,7 @@ function ReportBox(props) {
                 {
                     role === "admin" ?
                     <>
+                    <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button>
                     <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
                     <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                     <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>

@@ -468,7 +468,6 @@ async function updateTActivity(taID, taName, intro, goals, materials, instructio
 
 async function taskAssign(taskId, user) {
     try {
-        const docRef = collection(db, taskPath);
         const userDocRef = doc(db, "atlUsers", user);
 
         const userData = await getDoc(userDocRef);
