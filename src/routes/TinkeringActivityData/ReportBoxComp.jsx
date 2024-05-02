@@ -10,6 +10,7 @@ const Popup = React.lazy(() => import("../../components/Popup"));
 
 function ReportBox(props) {
     const role = atob(localStorage.auth).split("-")[2];
+    const email = atob(localStorage.auth).split("-")[1];
     const [displayValue, setDisplayValue] = React.useState("none");
     const students = props.students;
     const schools = props.schools;
@@ -316,11 +317,11 @@ function ReportBox(props) {
                 {
                     role === "admin" ?
                     <>
-                    <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button>
-                    <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
-                    <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
-                    <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
-                    <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
+                        {email === "mohan@hamaralabs.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
+                        <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
+                        <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                        <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
+                        <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
                     </>: ""
                 }
             </div>
