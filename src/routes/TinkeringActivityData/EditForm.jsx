@@ -284,6 +284,7 @@ function TinkeringActivityForm() {
             window.location.reload();
           });
         onSnapshot(q, (snapshot) => {
+            console.log(snapshot.data());
             setTAID(snapshot.data().taID);
             setTAName(snapshot.data().taName);
             setTaNamePermanent(snapshot.data().taName);
