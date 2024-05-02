@@ -10,6 +10,7 @@ import Sidebar from "../../components/Sidebar";
 function TinkeringActivityReport() {
     const [data, setData] = useState([]);
     const [loaderEnable, setLoaderEnable] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [displayData, setDisplayData] = useState([]);
     const [students, setStudents] = useState([]);
     const [schools, setSchools] = useState([]);
@@ -30,8 +31,6 @@ function TinkeringActivityReport() {
         onSnapshot(q, (querySnapshot) => {
             const dataArray = [];
             querySnapshot.forEach(snap => {
-                const timestamp = new Date(snap._document.createTime.timestamp.seconds*1000);
-                console.log(timestamp.getFullYear()+"-"+timestamp.getMonth()+"-"+timestamp.getDate(), timestamp)
                 let tempData = snap.data();
                 tempData.docId = snap.id;
                 dataArray.push(tempData);
@@ -137,7 +136,6 @@ function TinkeringActivityReport() {
             setDisplayData(temp);
         } else if ((subject !== "") && (topic !== "")) {
             data.forEach(ta => {
-                console.log("Hi", ta.topic);
                 if((ta.subject === subject) && (ta.topic === topic)) {
                     temp.push(ta);
                 }
@@ -145,7 +143,6 @@ function TinkeringActivityReport() {
             setDisplayData(temp);
         } else if (subject !== "") {
             data.forEach(ta => {
-                console.log("Hi", ta.topic);
                 if(ta.subject === subject) {
                     temp.push(ta);
                 }
@@ -227,6 +224,22 @@ function TinkeringActivityReport() {
 
     document.title = "Tinkering Activity Data Report | Digital ATL";
 
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Bars
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="black"
+                    ariaLabel="loading"
+                    wrapperStyle
+                    wrapperClass
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="container" id="mobilescreen">
             <Sidebar />
@@ -269,10 +282,11 @@ function TinkeringActivityReport() {
                                 wrapperClass
                             />
                         </center>
-                    ):(console.log("Disabled loader"))}
+                    ):""}
                     {
                         searchResults.map((activity, index) => {
                             return <ReportBox
+                                activity={activity}
                                 key={index}
                                 id={index}
                                 docId={activity.docId}
@@ -291,6 +305,7 @@ function TinkeringActivityReport() {
                                 assessment={activity.assessment}
                                 students={students}
                                 schools={schools}
+                                setLoading={setLoading}
                                 deleteActivity={deleteActivity}
                             />
                         })
@@ -358,6 +373,7 @@ function TinkeringActivityReport() {
             {displayData.map((activity, index) => {
                     return (
                         <ReportBox
+                            activity={activity}
                             key={index}
                             id={index}
                             docId={activity.docId}
@@ -376,6 +392,7 @@ function TinkeringActivityReport() {
                             assessment={activity.assessment}
                             students={students}
                             schools={schools}
+                            setLoading={setLoading}
                             deleteActivity={deleteActivity}
                         />
                     );
@@ -392,7 +409,7 @@ function TinkeringActivityReport() {
                         wrapperClass
                     />
                 </center>
-            ):(console.log("Disabled loader"))}
+            ):""}
         </div>
     );
 }

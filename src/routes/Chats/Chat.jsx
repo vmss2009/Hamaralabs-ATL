@@ -17,7 +17,7 @@ import storage from "../../firebase/storage";
 import MessageComp from "../ChatWithAdmin/MessageComp";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
-import { orderBy, set } from "lodash";
+import { orderBy } from "lodash";
 import { notificationsToAdmins, notificationsToUsers } from "../../firebase/cloudmessaging";
 
 function Chat() {
