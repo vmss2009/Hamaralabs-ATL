@@ -16,7 +16,6 @@ function TinkeringActivityForm() {
     const [taName, setTAName] = React.useState("");
     const [taNamePermanent, setTaNamePermanent] = React.useState("");
     const [subject, setSubject] = React.useState("");
-    const [subjectID, setSubjectID] = React.useState("");
     const [topic, setTopic] = React.useState("");
     const [subTopic, setSubTopic] = React.useState("");
     const [intro, setIntro] = React.useState("");
@@ -310,14 +309,13 @@ function TinkeringActivityForm() {
     }, []);
 
     React.useEffect(() => {
-        let id;
-        subjectData.forEach((value, index) => {
-            if (subject === value.name) {
-                id = value.id;
+        let subjectId;
+        for (let index = 0; index < subjectData.length; index++) {
+            if (subject === subjectData[index].name) {
+                subjectId = subjectData[index].id;
             }
-        });
-        setSubjectID(id);
-        getTopics(id || " ")
+        }
+        getTopics(subjectId || " ")
         .then((docSnaps) => {
             const dataArray = [];
             docSnaps.forEach((docSnap) => {
@@ -327,33 +325,30 @@ function TinkeringActivityForm() {
                   };
                 dataArray.push(temp);
             });
-    
+            
             setTopicData(dataArray.sort((a, b) => a.name.localeCompare(b.name)));
-        })
-        .catch((err) => {
-            window.location.reload();
-        });
-    }, [subject, topic, subTopic]);
 
-    React.useEffect(() => {
-        let id = "";
-        topicData.forEach((value, index) => {
-            if (topic === value.name) {
-                id = value.id;
+            let id;
+            for (let index = 0; index < dataArray.length; index++) {
+                if (topic === dataArray[index].name) {
+                    id = dataArray[index].id;
+                }
             }
-        });
-        getSubtopics(subjectID || " ", id || " ")
-        .then((docSnaps) => {
-            const dataArray = [];
-            docSnaps.forEach((docSnap) => {
-                const temp = {
-                    name: docSnap.data().name,
-                    id: docSnap.id
-                };
-                dataArray.push(temp);
+
+            getSubtopics(subjectId || " ", id || " ")
+            .then((docSnaps) => {
+                const dataArraySubTopics = [];
+                docSnaps.forEach((docSnap) => {
+                    const temp = {
+                        name: docSnap.data().name,
+                        id: docSnap.id
+                    };
+                    dataArraySubTopics.push(temp);
+
+                });
+
+                setSubtopicData(dataArraySubTopics.sort((a, b) => a.name.localeCompare(b.name)));
             });
-    
-            setSubtopicData(dataArray.sort((a, b) => a.name.localeCompare(b.name)));
         })
         .catch((err) => {
             window.location.reload();
@@ -433,6 +428,7 @@ function TinkeringActivityForm() {
                                 <option value="" disabled={true}>
                                     SELECT SUB TOPIC
                                 </option>
+                                {console.log(subTopicData)}
                                 {subTopicData.map((option, index) => (
                                     <option key={index} value={option.name}>
                                         {option.name}
