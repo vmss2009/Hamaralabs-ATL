@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Bars } from 'react-loader-spinner';
 import { query, onSnapshot, collection } from "firebase/firestore";
-
+import { toast, Bounce } from "react-toastify";
 import {db, deleteActivity, queryActivity, getSubjects, getTopics, getSubtopics} from "../../firebase/firestore";
 
 import ReportBox from "./ReportBoxComp";
@@ -69,6 +69,35 @@ function TinkeringActivityReport() {
             });
             setSchools(array);
         });
+
+        if (localStorage.getItem("activityId") !== undefined) {
+            if (localStorage.getItem("activityId") !== null) {
+                if (localStorage.getItem("activityId") !== "") {
+                    console.log(localStorage.getItem("activityId"));
+                    toast.success(
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3>{localStorage.getItem("activityId")}</h3>
+                        <span style={{cursor: "pointer"}} onClick={() => {
+                            navigator.clipboard.writeText(localStorage.getItem("activityId"))
+                        }}><i class="fa-solid fa-copy fa-xl"></i>
+                        </span>
+                      </div>, {
+                        position: "bottom-center",
+                        autoClose: false,
+                        closeOnClick: false,
+                        hideProgressBar: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        transition: Bounce,
+                        onClose: () => {
+                            localStorage.removeItem("activityId");
+                        }
+                    });
+                }
+            }
+        }
     }, []);
 
     function handleChange(event) {
