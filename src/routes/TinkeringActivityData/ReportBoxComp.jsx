@@ -180,16 +180,20 @@ function ReportBox(props) {
 
     async function generateTA() {
         props.setLoading(true);
-        const response = await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/tinkeringActivityAI/generate", {"inputText": "Only give me the JSON without any extra letters !!!. Just give me the object !!. No other extra word. Give me the next best tinkering activity for the given TA" + JSON.stringify(props.activity)});
+        const response = await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/tinkeringActivityAI/generate", {"inputText": "Only give me the JSON without any extra letters !!!. Just give me the object !!!. No other extra word. Give me the next best tinkering activity of the same type with slightly increased complexity for the given TA." + JSON.stringify(props.activity)});
         const axiosResponse = response.data;
         const responseText = axiosResponse.response.response.candidates[0].content.parts[0].text;
         console.log(responseText);
         const newTA = JSON.parse(responseText.replace(/\n/g, ''));
         console.log(newTA);
+        newTA.subject = props.subject || "";
+        newTA.topic = props.topic || "";
+        newTA.subTopic = props.subTopic || "";
         const docRef = doc(db, "taData", newTA.taID);
 
         await setDoc(docRef, newTA);
         props.setLoading(false);
+        localStorage.setItem("activityId", newTA.taID);
         window.location.reload();
     }
 
@@ -309,7 +313,7 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Resources:</span> <br/> {
                 props.resources.map((resource, index) => {
-                    return <span key={index}>{index+1}. {isValidUrl(resource) ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : resource} <br/></span>
+                    return <span key={index}>{index+1}. {isValidUrl(resource) ? resource.startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-prod.appspot.com/o/tAFiles") ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : <a href={resource} target="_blank" rel="noreferrer">{resource}</a> : resource} <br/></span>
                 })
             }
             </div>

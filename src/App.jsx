@@ -1,9 +1,9 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 import {query, onSnapshot, doc, collection, setDoc} from "firebase/firestore";
-
+import { ToastContainer, Bounce } from "react-toastify";
 import {db} from "./firebase/firestore";
-
+import 'react-toastify/dist/ReactToastify.css';
 
 import Router from "./Router";
 import HL_Logo from "./HL Sticker.png";
@@ -151,6 +151,17 @@ function App() {
         <div>
             <React.Suspense fallback={<FallBack />}>
                 <RouterProvider router={Router} />
+                <ToastContainer
+                position="bottom-center"
+                autoClose={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+                transition={Bounce}
+                />
             </React.Suspense>
         </div>
     );
