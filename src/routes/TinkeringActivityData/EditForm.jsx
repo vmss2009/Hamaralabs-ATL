@@ -2,7 +2,7 @@ import React from "react";
 import {doc, onSnapshot, query} from "firebase/firestore";
 
 import {db, updateActivity, getSubjects, getTopics, getSubtopics} from "../../firebase/firestore";
-import {getDownloadURL, getStorage, ref, uploadBytes, listAll, deleteObject} from "firebase/storage";//newline
+import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";//newline
 import {useParams} from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import fbApp from "../../firebase/app";//newline
