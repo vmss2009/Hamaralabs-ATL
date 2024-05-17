@@ -318,12 +318,14 @@ function ReportBox(props) {
             }
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
+                {role === "atlIncharge" || role === "mentor" ? 
+                    <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                : ""}
                 {
                     role === "admin" ?
                     <>
                         {email === "mohan@hamaralabs.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
                         <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
-                        <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                         <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
                         <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
                     </>: ""
