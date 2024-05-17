@@ -32,6 +32,7 @@ function TinkeringActivityReport() {
             const dataArray = [];
             querySnapshot.forEach(snap => {
                 let tempData = snap.data();
+                console.log(tempData);
                 tempData.docId = snap.id;
                 dataArray.push(tempData);
             });
