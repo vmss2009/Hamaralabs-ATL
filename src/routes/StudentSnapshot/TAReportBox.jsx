@@ -11,11 +11,21 @@ function ReportBox(props) {
     const [popupOpen, setPopupOpen] = React.useState(false);
     const files = props.uploadFile;
 
+    function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (err) {
+          return false;
+        }
+    }
+
     function getFileNameFromUrl(url, operation) {
         const urlObj = new URL(url);
         const pathSegments = urlObj.pathname.split('/');
         const encodedFileName = pathSegments[pathSegments.length - 1];
         let fileName = decodeURIComponent(encodedFileName);
+        console.log(fileName);
         fileName = fileName.replace(`tAFiles/${operation}/`, '');
         return fileName;
     }
@@ -29,7 +39,6 @@ function ReportBox(props) {
         await setDoc(docRef, {
             status: statusData
         }, {merge: true});
-        // <student name> from <student school name> changed status of <TA name>
         const userDocRef = doc(db, "studentData", props.studentId);
         const userData = await getDoc(userDocRef);
         console.log(userData.data());
@@ -159,7 +168,7 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Resources:</span> <br/> {
                 props.resources.map((resource, index) => {
-                    return <span key={index}>{index+1}. {resource} <br/></span>
+                    return <span key={index}>{index+1}. {isValidUrl(resource) ? resource.startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-prod.appspot.com/o/tAFiles") ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : <a href={resource} target="_blank" rel="noreferrer">{resource}</a> : resource} <br/></span>
                 })
             }
             </div>
