@@ -318,7 +318,7 @@ function ReportBox(props) {
             }
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
-                {role === "atlIncharge" || role === "mentor" ? 
+                {role === "atlIncharge" || role === "mentor" || role === "admin" ? 
                     <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                 : ""}
                 {
