@@ -61,6 +61,7 @@ const ChatDashboard = React.lazy(() => import("./routes/Chats/Dashboard"));
 const Chat = React.lazy(() => import("./routes/Chats/Chat"));
 
 const Notifications = React.lazy(() => import("./routes/Notifications/Notifications"));
+const Payments = React.lazy(() => import("./routes/Payments/Payments"));
 
 const Page404 = React.lazy(() => import("./routes/404"));
 const Offline = React.lazy(() => import("./routes/Offline"));
@@ -331,6 +332,10 @@ const Router = createBrowserRouter([
     {
         path: "/notifications",
         element: (localStorage.getItem("auth") !== null) ? ((role === "admin") || (role === "mentor") || (role === "atlIncharge") ? <Notifications /> : <NoAccess name={"Notifications"}/>) : (<Login />),
+    },
+    {
+        path: "/payments",
+        element: (localStorage.getItem("auth") !== null) ? (<Payments/>) : (<Login />),
     },
     {
         path: "/offline",
