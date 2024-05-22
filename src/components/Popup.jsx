@@ -5,11 +5,11 @@ function Popup(props) {
         props.setPopupEnabled(false);
     }
 
-    document.body.onkeydown = function(event) {
-        if(event.key === "Escape") {
-            props.setPopupEnabled(false);
-        }
-    }
+    // document.body.onkeydown = function(event) {
+    //     if(event.key === "Escape") {
+    //         props.setPopupEnabled(false);
+    //     }
+    // }
 
     return (props.trigger) ? (
         <div className="popup" style={{

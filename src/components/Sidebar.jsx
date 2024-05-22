@@ -106,11 +106,14 @@ function Sidebar() {
                         <Link to="/chat-with-admin"><li className={role !== "admin" ? "nav-item last-li" : "nav-item"}>Chat with Admin</li></Link>
                         {role === "admin" ? <Link to="/notifications"><li className="nav-item last-li">Notifications</li></Link> : ""}
                     </div>
-                        <br/>
-                        {/*<a href="/profile"><li className="nav-item">Your Profile</li></a>*/}
-                        <li className="nav-item last-li logout" style={{cursor: "pointer"}} onClick={logout}>Logout</li>
+                    <div className="subTitle"><li className="nav-item">Payments</li></div>
+                    <div className="subContent">
+                        <Link to="/payments"><li className="nav-item last-li">Payments</li></Link>
+                    </div>
                     <br/>
-
+                    {/*<a href="/profile"><li className="nav-item">Your Profile</li></a>*/}
+                    <li className="nav-item last-li logout" style={{cursor: "pointer"}} onClick={logout}>Logout</li>
+                    <br/>
                 </ul>
             </div>
             <div className="open-overlay" onClick={overlayToggle}></div>

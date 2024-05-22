@@ -1,10 +1,5 @@
 import React from "react";
-import {Bars} from "react-loader-spinner";
-import readXlsxFile from "read-excel-file";
-import {Draggable, Droppable, DragDropContext} from "react-beautiful-dnd";
-
 import {addActivity, addProject, db} from "../../firebase/firestore";
-import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
 import {collection, onSnapshot, query} from "firebase/firestore";
 
