@@ -4,7 +4,6 @@ import db, {addActivity} from "../../firebase/firestore";
 import axios from "axios";
 import Select from 'react-select';
 import lodash from "lodash";
-import { Bars } from "react-loader-spinner";
 
 const Popup = React.lazy(() => import("../../components/Popup"));
 
@@ -15,6 +14,7 @@ function ReportBox(props) {
     const students = props.students;
     const schools = props.schools;
     const [school, setSchool] = React.useState("");
+    const [checkBox, setCheckBox] = React.useState(null);
     const [assignToOpen, setAssignToOpen] = React.useState(false);
     const [selectedOptions, setSelectedOptions] = React.useState([]);
     const [studentData, setStudentData] = React.useState([]);
@@ -40,7 +40,6 @@ function ReportBox(props) {
         )
 
     async function handleDelete(event) {
-        console.log(props.docId);
         if(window.confirm("You are about to delete an activity")) {
             await props.deleteActivity(props.docId)
                 .then(() => {
@@ -91,7 +90,7 @@ function ReportBox(props) {
     //     alert("Assigned!");
     // }
 
-    async function handleAssignTo(event) {
+    async function handleAssignTo() {
         if (selectedOptions.length === 0) {
             alert("Please select at least one student to assign the Tinkering Activity.");
             return;
@@ -109,7 +108,13 @@ function ReportBox(props) {
             const data = taData.data();
     
             data.status = [{ status: "Assigned", modifiedAt: currentDate }];
-    
+            data.paymentRequired = checkBox;
+            data.paymentInfo = {
+                status: "pending",
+                amount: 50,
+                merchantTransactionId: "",
+            }
+
             const assignTAPromise = setDoc(assignPathDocRef, data);
             const studentRef = doc(db, "studentData", assignToStudent);
             const updateStudentPromise = setDoc(studentRef, {
@@ -218,7 +223,7 @@ function ReportBox(props) {
                     <Popup trigger={assignToOpen} setPopupEnabled={setAssignToOpen} closeAllowed={true}>
                         <div className="container" style={{ fontSize: "1.2rem" }}>
                         Assign to School:
-                        <select name="schoolSelect" onChange={e => setSchool(e.target.value)} value={school}>
+                        <select name="schoolSelect" onChange={e => {setCheckBox(schools[e.target.options.selectedIndex].isATL ? false : true); setSchool(e.target.value)}} value={school}>
                         <option value="" disabled={true}>SELECT</option>
                         {schools
                             .filter((school, index) => {
@@ -250,8 +255,21 @@ function ReportBox(props) {
                         closeMenuOnSelect={false}
                         hideSelectedOptions={false}
                         />
-                            <br/>
-                            <button className="submitbutton" onClick={handleAssignTo}>Assign</button>
+
+                        {
+                            checkBox !== null && role === "admin" ? 
+                                <>
+                                <br/>
+                                <label>
+                                    Payment required ? &nbsp;
+                                    <input type={"checkbox"} defaultChecked={checkBox} onChange={(e) => {setCheckBox(e.target.value)}}/>
+                                </label>
+                                </>
+                            : ""
+                        }
+                        
+                        <br/>
+                        <button className="submitbutton" onClick={handleAssignTo}>Assign</button>
                         </div>
                     </Popup>
               )  : ""

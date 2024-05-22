@@ -290,6 +290,8 @@ function DisplayElement(props) {
                         status={activity.status}
                         deleteActivity={deleteActivity}
                         uid={props.uid}
+                        paymentInfo={activity.paymentInfo}
+                        paymentRequired={activity.paymentRequired}
                     />
                 );
             })}

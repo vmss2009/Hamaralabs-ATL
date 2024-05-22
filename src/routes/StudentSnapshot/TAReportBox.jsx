@@ -3,6 +3,7 @@ import Popup from "../../components/Popup";
 import {getDoc, doc, setDoc} from "firebase/firestore";
 import db, {deleteAssignedTA} from "../../firebase/firestore";
 import { notificationsToAdmins } from "../../firebase/cloudmessaging";
+import { Link } from "react-router-dom";
 
 function ReportBox(props) {
     const [displayValue, setDisplayValue] = React.useState("none");
@@ -79,7 +80,7 @@ function ReportBox(props) {
 
     const role = atob(localStorage.getItem("auth")).split("-")[2];
 
-    return (// need lighter green
+    return (
         <div className="box" id={props.id} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} style={{backgroundColor: props.status[props.status.length-1].status === "TA Completed" && "#ccffcc"}}>
             <link rel="stylesheet" href="/CSS/form.css"/>
             {
@@ -122,87 +123,92 @@ function ReportBox(props) {
             <div className="name" style={{fontSize: "1.5rem"}}>{props.taName}</div>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>TA ID:</span> {props.taID}</div>
             <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Introduction:</span> {props.intro}</div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Goals:</span> <br/> {
-                props.goals.map((goal, index) => {
-                    return <span key={index}>{index+1}. {goal} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Materials:</span> <br/> {
-                props.materials.map((material, index) => {
-                    return <span key={index}>{index+1}. {material} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Instructions:</span> <br/> {
-                props.instructions.map((instruction, index) => {
-                    return <span key={index}>{index+1}. {instruction} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Observation:</span> <br/> {
-                props.assessment.map((assessment, index) => {
-                    return <span key={index}>{index+1}. {assessment} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Tips:</span> <br/> {
-                props.tips.map((tip, index) => {
-                    return <span key={index}>{index+1}. {tip} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Extensions:</span> <br/> {
-                props.extensions.map((extension, index) => {
-                    return <span key={index}>{index+1}. {extension} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Resources:</span> <br/> {
-                props.resources.map((resource, index) => {
-                    return <span key={index}>{index+1}. {isValidUrl(resource) ? resource.startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-prod.appspot.com/o/tAFiles") ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : <a href={resource} target="_blank" rel="noreferrer">{resource}</a> : resource} <br/></span>
-                })
-            }
-            </div>
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Comments:  </span>{props.comment}</div>
-            <br/>
-            {/* {props.uploadFile?<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span><a href={props.uploadFile} target="_blank" rel="noreferrer">Click here to open</a></div>:<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span>None</div>} */}
-            {
-                files !== undefined && files.length > 0 ?
-                <div className="boxContainer"><span style={{fontWeight: "600"}}>Files:</span> <br/> {
-                    files.map((file, index) => {
-                        return <span key={index}>{index+1}. <a href={file} target="_blank" rel="noreferrer">{getFileNameFromUrl(file, props.taName)}</a> <br/></span>
+            
+            { props.paymentInfo === undefined || props.paymentRequired === false || (props.paymentInfo.status === "paid" && props.paymentRequired) ?
+                <>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Introduction:</span> {props.intro}</div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Goals:</span> <br/> {
+                    props.goals.map((goal, index) => {
+                        return <span key={index}>{index+1}. {goal} <br/></span>
                     })
                 }
                 </div>
-                : ""
-            }
-            <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Status Tracking:</span> <br/> {
-                props.status.map((eachStatus, index) => {
-                    return <span key={index}>{index+1}. {eachStatus.status} - <span> {eachStatus.modifiedAt} </span> <br/></span>
-                })
-            }</div>
-            <br/>
-            <div className="boxContainer">
-                <span style={{fontWeight: "600"}}>Current Status:</span> {props.status[props.status.length-1].status} - <span> {props.status[props.status.length-1].modifiedAt} </span>
-            </div>
-            {
-                props.status[props.status.length-1] !== "TA Completed" || role === "admin" || role === "atlIncharge" ?
-                    <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
-                        <button className="resetbutton editBtn" onClick={handleEdit}><i className="fa-solid fa-pencil"></i></button>
-                        <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
-                        <button className="submitbutton" onClick={() => {setPopupOpen(true)}}>Modify Status</button>
-                    </div>: ""
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Materials:</span> <br/> {
+                    props.materials.map((material, index) => {
+                        return <span key={index}>{index+1}. {material} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Instructions:</span> <br/> {
+                    props.instructions.map((instruction, index) => {
+                        return <span key={index}>{index+1}. {instruction} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Observation:</span> <br/> {
+                    props.assessment.map((assessment, index) => {
+                        return <span key={index}>{index+1}. {assessment} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Tips:</span> <br/> {
+                    props.tips.map((tip, index) => {
+                        return <span key={index}>{index+1}. {tip} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Extensions:</span> <br/> {
+                    props.extensions.map((extension, index) => {
+                        return <span key={index}>{index+1}. {extension} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Resources:</span> <br/> {
+                    props.resources.map((resource, index) => {
+                        return <span key={index}>{index+1}. {isValidUrl(resource) ? resource.startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-prod.appspot.com/o/tAFiles") ? <a href={resource} target="_blank" rel="noreferrer">{getFileNameFromUrl(resource, props.taName)}</a> : <a href={resource} target="_blank" rel="noreferrer">{resource}</a> : resource} <br/></span>
+                    })
+                }
+                </div>
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Comments:  </span>{props.comment}</div>
+                <br/>
+                {/* {props.uploadFile?<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span><a href={props.uploadFile} target="_blank" rel="noreferrer">Click here to open</a></div>:<div className="boxContainer"><span style={{fontWeight: "600"}}>Upload File: </span>None</div>} */}
+                {
+                    files !== undefined && files.length > 0 ?
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>Files:</span> <br/> {
+                        files.map((file, index) => {
+                            return <span key={index}>{index+1}. <a href={file} target="_blank" rel="noreferrer">{getFileNameFromUrl(file, props.taName)}</a> <br/></span>
+                        })
+                    }
+                    </div>
+                    : ""
+                }
+                <br/>
+                <div className="boxContainer"><span style={{fontWeight: "600"}}>Status Tracking:</span> <br/> {
+                    props.status.map((eachStatus, index) => {
+                        return <span key={index}>{index+1}. {eachStatus.status} - <span> {eachStatus.modifiedAt} </span> <br/></span>
+                    })
+                }</div>
+                <br/>
+                <div className="boxContainer">
+                    <span style={{fontWeight: "600"}}>Current Status:</span> {props.status[props.status.length-1].status} - <span> {props.status[props.status.length-1].modifiedAt} </span>
+                </div>
+                {
+                    props.status[props.status.length-1] !== "TA Completed" || role === "admin" || role === "atlIncharge" ?
+                        <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
+                            <button className="resetbutton editBtn" onClick={handleEdit}><i className="fa-solid fa-pencil"></i></button>
+                            <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
+                            <button className="submitbutton" onClick={() => {setPopupOpen(true)}}>Modify Status</button>
+                        </div>: ""
+                }
+                </> : <><h3>Please pay the required amount to access this tinkering activity <Link to="/payments"><li className="nav-item last-li">Payments</li></Link></h3><br/></>
             }
         </div>
     );
