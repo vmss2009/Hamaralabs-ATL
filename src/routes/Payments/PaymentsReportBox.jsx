@@ -76,7 +76,7 @@ function PaymentReportBox(props) {
                 merchantTransactionId: merchantTransactionId,
                 merchantUserId: merchantUserId,
                 amount: discountedValue,
-                redirectUrl: `http://localhost:3000/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
+                redirectUrl: `https://app.hamaralabs.com/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
 
             })
             .then((res) => {
@@ -91,7 +91,7 @@ function PaymentReportBox(props) {
                 merchantTransactionId: merchantTransactionId,
                 merchantUserId: merchantUserId,    
                 amount: tinkeringActivityAmount,
-                redirectUrl: `http://localhost:3000/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
+                redirectUrl: `https://app.hamaralabs.com/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
             })
             .then((res) => {
                 console.log(res);
