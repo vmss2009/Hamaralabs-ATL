@@ -262,8 +262,7 @@ function ReportBox(props) {
                                 <br/>
                                 <label>
                                     Payment required ? &nbsp;
-                                    <input type={"checkbox"} defaultChecked={checkBox} onChange={(e) => {setCheckBox(e.target.value)}}/>
-                                </label>
+                                    <input type={"checkbox"} defaultChecked={checkBox} onChange={(e) => {setCheckBox(e.target.checked)}}/>                                </label>
                                 </>
                             : ""
                         }
@@ -309,7 +308,7 @@ function ReportBox(props) {
             }
             </div>
             <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Observation:</span> <br/> {
+            <div className="boxContainer"><span style={{fontWeight: "600"}}>Obrvation:</span> <br/> {
                 props.assessment.map((assessment, index) => {
                     return <span key={index}>{index+1}. {assessment} <br/></span>
                 })
