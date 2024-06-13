@@ -10,7 +10,6 @@ function MessageComp(props) {
   const ref = React.useRef();
 
   React.useEffect(() => {
-    //  ref.current?.scrollIntoView({ behavior: "smooth" });
     const q = query(doc(db, "atlUsers", props.senderUID));
     onSnapshot(q, (snapshot) => {
       setSenderData(snapshot.data());
@@ -56,14 +55,16 @@ function MessageComp(props) {
           className="content"
           style={{ display: "block", textAlign: "left" }}
         >
-          {props.content === "image/png" ||
-          props.content === "image/jpg" ||
-          props.content === "image/jpeg" ? (
-            <img src={props.fileURL} alt="" style={{ maxHeight: "50vh" }} />
+          {props.content.includes("image/") ? (
+            <img
+              src={props.fileURL}
+              alt={props.fileName}
+              style={{ maxHeight: "50vh" }}
+            />
           ) : props.content.replace("application/") !== props.content ||
             props.content.replace("text/") !== props.content ? (
-            <a href={props.fileURL} rel="noreffer">
-              FileName: {props.name}
+            <a href={props.fileURL} rel="noreffer" target="__blank">
+              {props.fileName}
             </a>
           ) : props.content === "audio/mpeg" ? (
             <audio src={props.fileURL} controls={true} />
@@ -82,9 +83,9 @@ function MessageComp(props) {
           >
             {props.time}
           </span>
+          {props.children}
         </div>
       </div>
-      <span ref={ref}></span>
     </div>
   );
 }
