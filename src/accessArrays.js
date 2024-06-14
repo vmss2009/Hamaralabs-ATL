@@ -32,7 +32,7 @@ const studentsCourses = ["admin", "atlIncharge", "student"];
 
 const studentsCompetitions = ["admin", "atlIncharge", "student"];
 
-const studentSnapshot = ["admin", "atlIncharge", "student", "mentor"];
+const studentSnapshot = ["admin", "atlIncharge", "student"];
 const projectForm = ["admin", "atlIncharge"];
 const projectReport = ["admin", "atlIncharge"];
 

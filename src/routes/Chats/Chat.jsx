@@ -53,6 +53,7 @@ function Chat() {
   }
 
   let uid;
+  let role;
 
   if (localStorage.auth != null) {
     let decodedAuth = atob(localStorage.auth);
@@ -60,6 +61,7 @@ function Chat() {
     let split = decodedAuth.split("-");
 
     uid = split[0];
+    role = split[2];
   }
 
   const groupRef = doc(db, "chats", groupId);
@@ -244,6 +246,29 @@ function Chat() {
     setFilesUpload(event.target.files);
   }
 
+  function getTimestamp(date, time) {
+    // Split the date to get day, month, and year
+    const [day, month, year] = date.split("-").map(num => parseInt(num, 10));
+  
+    // Split the time to get hours and minutes, and adjust for AM/PM
+    let [hours, minutesPart] = time.split(":");
+    let minutes = parseInt(minutesPart, 10);
+    let ampm = minutesPart.slice(-2);
+    hours = parseInt(hours, 10);
+  
+    // Convert 12-hour clock to 24-hour clock based on AM/PM
+    if (ampm === "PM" && hours < 12) {
+      hours += 12;
+    } else if (ampm === "AM" && hours === 12) {
+      hours = 0;
+    }
+  
+    // Create a Date object
+    const dateTime = new Date(year, month - 1, day, hours, minutes);
+    
+    return dateTime;
+  }
+
   async function onRecordingComplete(recordedBlob) {
     setLoadingTrigger(true);
     const uploadingFileName = Date.now() + ".mp3";
@@ -390,8 +415,10 @@ function Chat() {
   // Function to display messages grouped by dates
   const messageList = () => {
     let refDate = ""; // Current date reference
-    return data.map((message, messageIndex) => (
-      <div>
+    return data.map((message, messageIndex) => {
+      const timeStamp = getTimestamp(message.date, message.time);
+      const isDelete = (Date.now() - timeStamp.getTime())/1000 < 120;
+      return <div>
         <div style={{ textAlign: "center" }}>
           {refDate !== message.date && (
             <h2
@@ -423,6 +450,7 @@ function Chat() {
             date={message.date}
             time={message.time}
           >
+            { role === "admin" || (uid === message.senderRef.path.replace("atlUsers/", "") && isDelete) ?
             <span>
               <button // Button that deleted the message
                 type="button"
@@ -440,10 +468,11 @@ function Chat() {
                 <i class="fa-solid fa-trash"></i>
               </button>
             </span>
+            : ""}
           </MessageComp>
         </div>
       </div>
-    ));
+    });
   };
 
   return (
