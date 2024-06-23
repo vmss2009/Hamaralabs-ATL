@@ -342,60 +342,6 @@ async function queryTeam(field, comparision, value) {
     return querySnapshot;
 }
 
-/*sucharitha 13.1*/
-async function addSession(sessionTutor, sessionType, sessionDate, sessionTime,  schools) {
-    const docRef = collection(db, sessionPath);
-    await addDoc(docRef, {
-      sessionTutor: sessionTutor,
-      sessionType: sessionType,
-      sessionDate: sessionDate,
-      sessionTime: sessionTime,
-      schools: schools, 
-    });
-  }
-  
-  async function getSession() {
-    const docRef = collection(db, sessionPath);
-    const docSnaps = await getDocs(docRef);
-    return docSnaps.docs.map(doc => doc.data());
-  }
-  
-  async function getSessions() {
-    const docRef = collection(db, sessionPath);
-    const docSnaps = await getDocs(docRef);
-    return docSnaps;
-  }
-  
-  async function updateSession(sessionId, schools, sessionType,  sessionTutor, sessionDate,  sessionTime) {
-    const docRef = doc(db, sessionPath, sessionId);
-    // const updates = {};
-    await updateDoc(docRef, {
-      sessionTutor: sessionTutor,
-      sessionType: sessionType,
-      sessionDate: sessionDate,
-      sessionTime: sessionTime,
-      schools: schools,
-    });
-  }
-  
-  
-  async function deleteSession(docId) {
-    const docRef = doc(db, sessionPath, docId);
-    const snap = await getDoc(docRef);
-    const archiveRef = doc(db, "archivedData", "appData", sessionPath, docId);
-    await setDoc(archiveRef, snap.data());
-    await deleteDoc(docRef);
-  }
-  
-  async function querySession(field, comparision, value) {
-    const ref = collection(db, sessionPath);
-    const q = await query(ref, where(field, comparision, value));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot;
-}
-  
-/*sucharitha 13.1*/
-
 async function addActivity(taID, taName, subject, topic, subTopic, intro, goals, materials, instructions, tips, assessment, extensions, resources) {
     const docRef = doc(db, activityPath, taID);
 
@@ -801,7 +747,7 @@ async function queryCourse(field, comparision, value) {
 
 async function addProject(projectId, projectName, projectDescription, projectStartDate, projectEndDate, tags, projectMembers, tasks, schoolName = "all") {
     const ref = doc(db, projectsPath, projectId);
-    const docSnap = await setDoc(ref, {
+    await setDoc(ref, {
         projectId: projectId,
         projectName: projectName,
         projectDescription: projectDescription,
@@ -828,7 +774,7 @@ async function getProject(projectId) {
 
 async function updateProject(projectId, projectName, projectDescription, projectStartDate, projectEndDate, tags, projectMembers, tasks) {
     const ref = doc(db, projectsPath, projectId);
-    const docSnap = await setDoc(ref, {
+    await setDoc(ref, {
         projectId: projectId,
         projectName: projectName,
         projectDescription: projectDescription,
@@ -946,6 +892,80 @@ async function queryPartner(field, comparision, value) {
     return querySnapshot;
 }
 
+async function addSession(subject, topic, subTopic, timestamp, duration, prerequisites, type) {
+    const docRef = collection(db, sessionPath);
+
+    const data = {
+        subject: subject,
+        topic: topic,
+        subTopic: subTopic,
+        timestamp: timestamp,
+        duration: parseInt(duration),
+        prerequisites: prerequisites,
+        type: type
+    }
+
+    await addDoc(docRef, data);
+}
+
+async function getSessions() {
+    const docRef = collection(db, sessionPath);
+    const docSnaps = await getDocs(docRef);
+    return docSnaps;
+}
+
+async function getSession(sessionId) {
+    const docRef = doc(db, sessionPath, sessionId);
+    const docSnap = await getDoc(docRef);
+    return docSnap;
+}
+
+async function updateSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, sessionId) {
+    const docRef = doc(db, sessionPath, sessionId);
+
+    const data = {
+        subject: subject,
+        topic: topic,
+        subTopic: subTopic,
+        timestamp: timestamp,
+        duration: parseInt(duration),
+        prerequisites: prerequisites,
+        type: type
+    }
+
+    await setDoc(docRef, data, {merge: true});
+}
+
+async function updateStudentSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, sessionDocRef) {
+
+    const data = {
+        subject: subject,
+        topic: topic,
+        subTopic: subTopic,
+        timestamp: timestamp,
+        duration: parseInt(duration),
+        prerequisites: prerequisites,
+        type: type
+    }
+
+    await updateDoc(sessionDocRef, data);
+}
+
+async function deleteSession(docId) {
+    const docRef = doc(db, sessionPath, docId);
+    const snap = await getDoc(docRef);
+    const archiveRef = doc(db, "archivedData", "appData", sessionPath, docId);
+    await setDoc(archiveRef, snap.data());
+    await deleteDoc(docRef);
+}
+
+async function querySession(field, comparision, value) {
+    const ref = collection(db, sessionPath);
+    const q = await query(ref, where(field, comparision, value));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot;
+}
+
 async function deleteAssignedTA(docId, taskId) {
     const docRef = doc(db, studentPath, docId, "taData", taskId);
     const snap = await getDoc(docRef);
@@ -1055,6 +1075,6 @@ export { addCompetition, getCompetitions, getCompetition, updateCompetition, del
 export { addCourse, getCourses, getCourse, updateCourse, deleteCourse, queryCourse, deleteAssignedCourse, updateStudentCourse };
 export { addProject, getProjects, getProject, updateProject, deleteProject, queryProject };
 export { addPartner, getPartners, getPartner, updatePartner, deletePartner, queryPartner };
-export { addSession, getSessions, getSession, updateSession, deleteSession, querySession };
+export { addSession, getSessions, getSession, updateSession, deleteSession, querySession, updateStudentSession };
 export { task, taskAssign, deleteTask, getTasksById };
 export { addSubject, getSubjects, deleteSubject, addTopic, getTopics, deleteTopic, addSubTopic, getSubtopics, deleteSubtopic};
