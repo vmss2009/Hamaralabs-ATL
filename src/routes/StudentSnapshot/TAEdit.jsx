@@ -1,5 +1,5 @@
 import React from "react";
-import {doc, collection, onSnapshot, query} from "firebase/firestore";
+import {doc, onSnapshot, query} from "firebase/firestore";
 
 import {db, updateTActivity} from "../../firebase/firestore";
 import {useParams} from "react-router-dom";
