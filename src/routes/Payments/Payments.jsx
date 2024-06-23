@@ -45,8 +45,8 @@ function Payments() {
         onSnapshot(studentDataQuery, (studentQuerySnapshot) => {
             studentQuerySnapshot.forEach(snap => {
                 window.docId = snap.id;
-                const qTa = query(collection(db, "studentData", snap.id, "taData"), where("paymentInfo.status", "==", "pending"));
-                onSnapshot(qTa, (taQuerySnapshot) => {
+                const q = query(collection(db, "studentData", snap.id, "taData"), where("paymentInfo.status", "==", "pending"));
+                onSnapshot(q, (taQuerySnapshot) => {
                     const dataArray = [];
                     taQuerySnapshot.forEach(taSnap => {
                         const temp = taSnap.data();
@@ -54,8 +54,9 @@ function Payments() {
                         temp.type = "tinkeringActivity";
                         dataArray.push(temp);
                     });
-                    setPaymentsData(...paymentsData, dataArray);
-                });
+                    setPaymentsData(dataArray);
+                    console.log(dataArray);
+                })
             });
         });
         const userDoc = doc(db, "atlUsers", uid);
