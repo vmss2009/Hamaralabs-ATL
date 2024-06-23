@@ -1,7 +1,6 @@
 import React from "react";
 import {createBrowserRouter} from "react-router-dom";
 import SnapshotTAEditForm from "./routes/StudentSnapshot/TAEdit";
-import SnapshotSessionEditForm from "./routes/StudentSnapshot/SessionEdit";
 import SnapshotCompEditForm from "./routes/StudentSnapshot/CompetitionEdit";
 import SnapshotCourseEditForm from "./routes/StudentSnapshot/CoursesEdit";
 import Dashboard from "./routes/Chats/Dashboard";
@@ -137,10 +136,6 @@ const Router = createBrowserRouter([
                 element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
             }
         ]
-    },
-    {
-        path: "/student-data/snapshot/:studentId/session/edit/:sessionId",
-        element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={SnapshotSessionEditForm} />
     },
     {
         path: "/student-data/snapshot/:studentId/ta/edit/:activityId",

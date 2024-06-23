@@ -124,7 +124,7 @@ function ReportBox(props) {
             <div className="boxContainer"><span style={{fontWeight: "600"}}>TA ID:</span> {props.taID}</div>
             <br/>
             
-            { role === "admin" || props.paymentInfo === undefined || props.paymentRequired === false || (props.paymentInfo.status === "paid" && props.paymentRequired) ?
+            { props.paymentInfo === undefined || props.paymentRequired === false || (props.paymentInfo.status === "paid" && props.paymentRequired) ?
                 <>
                 <div className="boxContainer"><span style={{fontWeight: "600"}}>Introduction:</span> {props.intro}</div>
                 <br/>

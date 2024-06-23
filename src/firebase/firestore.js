@@ -900,7 +900,7 @@ async function addSession(subject, topic, subTopic, timestamp, duration, prerequ
         topic: topic,
         subTopic: subTopic,
         timestamp: timestamp,
-        duration: parseInt(duration),
+        duration: duration,
         prerequisites: prerequisites,
         type: type
     }
@@ -928,27 +928,12 @@ async function updateSession(subject, topic, subTopic, timestamp, duration, prer
         topic: topic,
         subTopic: subTopic,
         timestamp: timestamp,
-        duration: parseInt(duration),
+        duration: duration,
         prerequisites: prerequisites,
         type: type
     }
 
     await setDoc(docRef, data, {merge: true});
-}
-
-async function updateStudentSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, sessionDocRef) {
-
-    const data = {
-        subject: subject,
-        topic: topic,
-        subTopic: subTopic,
-        timestamp: timestamp,
-        duration: parseInt(duration),
-        prerequisites: prerequisites,
-        type: type
-    }
-
-    await updateDoc(sessionDocRef, data);
 }
 
 async function deleteSession(docId) {
@@ -1075,6 +1060,6 @@ export { addCompetition, getCompetitions, getCompetition, updateCompetition, del
 export { addCourse, getCourses, getCourse, updateCourse, deleteCourse, queryCourse, deleteAssignedCourse, updateStudentCourse };
 export { addProject, getProjects, getProject, updateProject, deleteProject, queryProject };
 export { addPartner, getPartners, getPartner, updatePartner, deletePartner, queryPartner };
-export { addSession, getSessions, getSession, updateSession, deleteSession, querySession, updateStudentSession };
+export { addSession, getSessions, getSession, updateSession, deleteSession, querySession };
 export { task, taskAssign, deleteTask, getTasksById };
 export { addSubject, getSubjects, deleteSubject, addTopic, getTopics, deleteTopic, addSubTopic, getSubtopics, deleteSubtopic};

@@ -15,8 +15,6 @@ function StudentReport() {
     const [searchValue, setSearchValue] = React.useState("");
     const [searchField, setSearchField] = React.useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [schools, setSchools] = useState([]);
-    const [students, setStudents] = useState([]);
 
     React.useEffect(() => {
         const q = query(collection(db, "sessionData"));
@@ -29,39 +27,6 @@ function StudentReport() {
             });
             setData(dataArray);
             setLoaderEnable(false);
-        });
-
-        const q2 = query(collection(db, "studentData"));
-        onSnapshot(q2, (querySnapshot) => {
-        const array = [];
-        querySnapshot.forEach((snap) => {
-            const temp = snap.data();
-            temp.docId = snap.id;
-            array.push(temp);
-        });
-        setStudents(array);
-        });
-
-        const q3 = query(collection(db, "schoolData"));
-        onSnapshot(q3, (querySnapshot) => {
-        const array = [];
-        querySnapshot.forEach((snap) => {
-            if (atob(localStorage.auth).split("-")[2] === "atlIncharge") {
-            const temp = snap.data();
-            if (
-                temp.atlIncharge.email === atob(localStorage.auth).split("-")[1]
-            ) {
-                temp.docId = snap.id;
-                array.push(temp);
-            }
-            } else {
-            const temp = snap.data();
-            temp.docId = snap.id;
-            array.push(temp);
-            }
-            setSchools(array);
-        });
-        setSchools(array);
         });
     }, []);
 
@@ -90,7 +55,6 @@ function StudentReport() {
 
             snaps.forEach((snap) => {
                 newResults.push(snap.data());
-                console.log(snap.data());
             });
 
             if(newResults.length === 0) {
@@ -164,9 +128,7 @@ function StudentReport() {
                                 timestamp={session.timestamp}
                                 duration={session.duration}
                                 type={session.type}
-                                prerequisites={session.prerequisites}
-                                students={students}
-                                schools={schools}
+                                prerequisistes={session.prerequisistes}
                                 docId={session.docId}
                                 deleteSession={deleteSession}
                             />);
@@ -200,8 +162,6 @@ function StudentReport() {
                         duration={session.duration}
                         type={session.type}
                         prerequisites={session.prerequisites}
-                        students={students}
-                        schools={schools}
                         docId={session.docId}
                         deleteSession={deleteSession}
                     />

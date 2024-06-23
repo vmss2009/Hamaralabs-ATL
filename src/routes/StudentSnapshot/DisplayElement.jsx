@@ -2,13 +2,11 @@ import React from "react";
 import CompetitionsReportBox from "./CompetitionsReportBox";
 import CoursesReportBox from "./CoursesReportBox";
 import {collection, onSnapshot, query} from "firebase/firestore";
-import db, {deleteActivity, deleteCompetition, deleteCourse, deleteSession} from "../../firebase/firestore";
+import db, {deleteActivity, deleteCompetition, deleteCourse} from "../../firebase/firestore";
 import TAReportBox from "./TAReportBox";
-import SessionReportBox from "./SessionReportBox";
 
 function DisplayElement(props) {
     const [sortBy, setSortBy] = React.useState("latest");
-    const [sessions, setSessions] = React.useState([]);
     const [tas, setTAs] = React.useState([]);
     const [competitions, setCompetitions] = React.useState([]);
     const [courses, setCourses] = React.useState([]);
@@ -153,52 +151,6 @@ function DisplayElement(props) {
         setTAs(temp);
     }, [sortBy]);
 
-    React.useEffect(() => {
-        if(props.type === "sessions") {
-            const q = query(collection(db, "studentData", props.studentId, "sessionData"));
-            onSnapshot(q, snaps => {
-                const temp = [];
-                snaps.forEach(snap => {
-                    const data = snap.data();
-                    data.docId = snap.id;
-                    temp.push(data);
-                    console.log(temp);
-                });
-                
-
-                temp.sort((a, b) => {
-                    const aDate = new Date(formatDate(a.status[a.status.length-1].modifiedAt));
-                    const bDate = new Date(formatDate(b.status[b.status.length-1].modifiedAt));
-
-                    if(sortBy === "latest") {
-                        return bDate - aDate;
-                    } else {
-                        return aDate - bDate;
-                    }
-                });
-
-                setSessions(temp);
-            });
-        }
-    }, [props.type, props.studentId]);
-
-    React.useEffect(() => {
-        const temp = [...sessions];
-
-        temp.sort((a, b) => {
-            const aDate = new Date(formatDate(a.status[a.status.length-1].modifiedAt));
-            const bDate = new Date(formatDate(b.status[b.status.length-1].modifiedAt));
-
-            if(sortBy === "latest") {
-                return bDate - aDate;
-            } else {
-                return aDate - bDate;
-            }
-        });
-
-        setSessions(temp);
-    }, [sortBy]);
-
     function formatDate(dateString) {
         const parts = dateString.split('-');
         let year = parts[0];
@@ -340,37 +292,6 @@ function DisplayElement(props) {
                         uid={props.uid}
                         paymentInfo={activity.paymentInfo}
                         paymentRequired={activity.paymentRequired}
-                    />
-                );
-            })}
-        </div>
-    } else if(props.type === "sessions") {
-        return <div>
-            <br/>
-            <div className="boxContainer">
-                Sort by: <select name="sortBy" id="sortBy" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                <option value="latest">Date - Latest</option>
-                <option value="oldest">Date - Oldest</option>
-            </select>
-            </div>
-            {sessions.map((session, index) => {
-                return (
-                    <SessionReportBox
-                        key={index}
-                        id={index}
-                        docId={session.docId}
-                        studentId={props.studentId}
-                        subject={session.subject}
-                        topic={session.topic}
-                        subTopic={session.subTopic}
-                        timestamp={session.timestamp}
-                        duration={session.duration}
-                        type={session.type}
-                        prerequisites={session.prerequisites}
-                        deleteSession={deleteSession}
-                        uid={props.uid}
-                        paymentInfo={session.paymentInfo}
-                        paymentRequired={session.paymentRequired}
                     />
                 );
             })}

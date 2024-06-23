@@ -249,9 +249,6 @@ function StudentsCompetitions(){
                     <div className="tab" onClick={handleTabChange} data-option="tas" style={currentlyViewing === "tas"?activeTabStyles:tabStyles} onMouseOver={handleTabMouseOver} onMouseOut={handleTabMouseOut}>
                         <i className="fa-solid fa-flask-vial"></i> Student Tinkering Activities
                     </div>
-                    <div className="tab" onClick={handleTabChange} data-option="sessions" style={currentlyViewing === "sessions"?activeTabStyles:tabStyles} onMouseOver={handleTabMouseOver} onMouseOut={handleTabMouseOut}>
-                        <i class="fa-solid fa-handshake"></i> Student Sessions
-                    </div>
                 </div>
                 {
                     currentlyViewing !== "" ?
