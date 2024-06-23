@@ -62,24 +62,12 @@ function AccessDeterminer(props) {
             temp = "Partner Data Form";
         } else if(props.accessForName === "partnerReport") {
             temp = "Partner Data Report";
-        } else if (props.accessForName === "sessionForm") {
-            temp = "Session Data Form";
-        } else if (props.accessForName === "sessionReport") {
-            temp = "Session Data Report";
         } else if(props.accessForName === "studentSnapshot") {
             temp = "Student Snapshot";
         } else if(props.accessForName === "competitionSnapshot") {
             temp = "Competition Snapshot";
         } else if(props.accessForName === "addFieldsForm") {
             temp = "AddFieldForm";
-        } else if (props.accessForName === "notifications") {
-            temp = "Notifications";
-        } else if (props.accessForName === "payments") {
-            temp = "Payments";
-        } else if (props.accessForName === "chats") {
-            temp = "Chats";
-        } else if (props.accessForName === "chatWithAdmin") {
-            temp = "Chat with Admin";
         }
 
         if(AccessObject[props.accessForName].includes(role)) {

@@ -1,7 +1,6 @@
 import React from "react";
 import {createBrowserRouter} from "react-router-dom";
 import SnapshotTAEditForm from "./routes/StudentSnapshot/TAEdit";
-import SnapshotSessionEditForm from "./routes/StudentSnapshot/SessionEdit";
 import SnapshotCompEditForm from "./routes/StudentSnapshot/CompetitionEdit";
 import SnapshotCourseEditForm from "./routes/StudentSnapshot/CoursesEdit";
 import Dashboard from "./routes/Chats/Dashboard";
@@ -48,10 +47,6 @@ const PartnerForm = React.lazy(() => import("./routes/PartnerData/Form"));
 const PartnerReport = React.lazy(() => import("./routes/PartnerData/Report"));
 const PartnerEditForm = React.lazy(() => import("./routes/PartnerData/EditForm"));
 
-const SessionForm = React.lazy(() => import("./routes/SessionsData/Form"));
-const SessionReport = React.lazy(() => import("./routes/SessionsData/Report"));
-const SessionEditForm = React.lazy(() => import("./routes/SessionsData/EditForm"));
-
 const Tasks = React.lazy(() => import("./routes/Tasks/Tasks"));
 const TaskEditForm = React.lazy(() => import("./routes/Tasks/EditForm"));
 
@@ -75,6 +70,7 @@ const ForgotPassword = React.lazy(() => import("./routes/ForgotPassword"));
 const FallBack = React.lazy(() => import("./App").then(module => ({default: module.FallBack})));
 
 const AccessDeterminer = React.lazy(() => import("./AccessDeterminer"));
+const NoAccess = React.lazy(() => import("./NoAccess"));
 
 let encodedAuth = localStorage.getItem("auth");
 
@@ -101,7 +97,7 @@ if (encodedAuth != null) {
 const Router = createBrowserRouter([
     {
         path: "/",
-        element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
+        element: (localStorage.getItem("auth") !== null) ? (<StudentSnapshot />) : (<Login />),
         errorElement: <Page404 />,
     },
     {
@@ -135,12 +131,11 @@ const Router = createBrowserRouter([
             {
                 path: "snapshot",
                 element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
+                children: [
+
+                ]
             }
         ]
-    },
-    {
-        path: "/student-data/snapshot/:studentId/session/edit/:sessionId",
-        element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={SnapshotSessionEditForm} />
     },
     {
         path: "/student-data/snapshot/:studentId/ta/edit/:activityId",
@@ -245,10 +240,14 @@ const Router = createBrowserRouter([
                 path: "archive",
                 element: <AccessDeterminer accessForName="competitionArchived" accessForComponent={ArchivedCompetitionReport} />
             },
+            //9.1 nageswar
             {
                 path: "snapshot",
                 element: <AccessDeterminer accessForName="competitionSnapshot" accessForComponent={CompetitionSnapshot} />,
-            }
+                children: [
+
+                ]
+            }//9.1 nageswar
         ]
     },
     {
@@ -303,23 +302,6 @@ const Router = createBrowserRouter([
         ]
     },
     {
-        path: "/session-data",
-        children: [
-            {
-                path: "add",
-                element: <AccessDeterminer accessForName="sessionForm" accessForComponent={SessionForm} />
-            },
-            {
-                path: "view",
-                element: <AccessDeterminer accessForName="sessionReport" accessForComponent={SessionReport} />
-            },
-            {
-                path: "edit/:sessionId",
-                element: <AccessDeterminer accessForName="sessionForm" accessForComponent={SessionEditForm} />
-            }
-        ]
-    },
-    {
         path: "/fallback",
         element: <FallBack />
     },
@@ -333,27 +315,27 @@ const Router = createBrowserRouter([
     },
     {
         path: "/chats",
-        element: <AccessDeterminer accessForName="chats" accessForComponent={ChatDashboard} />,
+        element: (localStorage.getItem("auth") !== null) ? (<ChatDashboard />) : (<Login />),
     },
     {
         path: "/chats/:groupId",
-        element: <AccessDeterminer accessForName="chats" accessForComponent={Chat} />,
+        element: (localStorage.getItem("auth") !== null) ? (<Chat />) : (<Login />)
     },
     {
         path: "/chat-with-admin",
-        element: <AccessDeterminer accessForName="chatWithAdmin" accessForComponent={AdminChat} />,
+        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <AdminChat /> : <UsersChat />) : (<Login />),
     },
     {
         path: "/chat-with-admin/:userId",
-        element: <AccessDeterminer accessForName="chatWithAdmin" accessForComponent={AdminIndividualChat} />,
+        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <AdminIndividualChat /> : <UsersChat />) : (<Login />),
     },
     {
         path: "/notifications",
-        element: <AccessDeterminer accessForName="notifications" accessForComponent={Notifications} />,
+        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") || (role === "mentor") || (role === "atlIncharge") ? <Notifications /> : <NoAccess name={"Notifications"}/>) : (<Login />),
     },
     {
         path: "/payments",
-        element: <AccessDeterminer accessForName="payments" accessForComponent={Payments} />,
+        element: (localStorage.getItem("auth") !== null) ? (<Payments/>) : (<Login />),
     },
     {
         path: "/offline",

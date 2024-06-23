@@ -37,7 +37,7 @@ function ReportBox(props) {
           />
           <span>{label}</span>
         </div>
-    )
+        )
 
     async function handleDelete(event) {
         if(window.confirm("You are about to delete an activity")) {

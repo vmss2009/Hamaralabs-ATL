@@ -61,7 +61,7 @@ function Sidebar() {
                     <div className="subContent">
                         <Link to="/ta-data/add"><li className="nav-item">Tinkering Activity form</li></Link>
                         <Link to="/ta-data/view"><li className="nav-item last-li">Tinkering Activity report</li></Link><br/>
-                        <Link to="/ta-data/add-subject"><li className="nav-item last-li">TA Dashboard</li></Link>
+                        {role === "admin" ? <Link to="/ta-data/add-subject"><li className="nav-item last-li">TA Dashboard</li></Link>: ""}
                     </div>
                     <div className="subTitle"><li className="nav-item">Competitions</li></div>
                     <div className="subContent">
@@ -75,11 +75,6 @@ function Sidebar() {
                         <Link to="/courses-data/add"><li className="nav-item">Courses Data Form</li></Link>
                         <Link to="/courses-data/view"><li className="nav-item last-li">Courses Data Report</li></Link>
                     </div></>: ""}
-                    {role !== "student" ? <><div className="subTitle"><li className="nav-item">Sessions</li></div>
-                    <div className="subContent">
-                        <Link to="/session-data/add"><li className="nav-item">Session Data Form</li></Link>
-                        <Link to="/session-data/view"><li className="nav-item last-li">Session Data Report</li></Link>
-                    </div></> : ""}
                     {role !== "student" ? <><div className="subTitle"><li className="nav-item">Teams</li></div>
                     <div className="subContent">
                         <Link to="/team-data/add"><li className="nav-item">Team form</li></Link>
