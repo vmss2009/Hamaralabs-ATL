@@ -89,6 +89,7 @@ function Tasks(){
             (async () => {
                 const studentDoc = doc(db, "studentData", selectedStudent);
                 const docData = await getDoc(studentDoc);
+                console.log(docData.data());
                 const studentEmail = docData.data().email;
                 console.log(studentEmail);
                 const q = query(collection(db, "atlUsers"), where("email", "==", studentEmail));
@@ -106,13 +107,14 @@ function Tasks(){
         onSnapshot(q, (snap) => {
             const tempData = snap.data();
             tempData.uid = snap.id;
-            if (tempData !== undefined) {
+            if (tempData.tasks !== undefined) {
                 tempData.tasks = tempData.tasks.sort((a, b) => {
                     return new Date(a.taskDueDate) - new Date(b.taskDueDate);
                 });
             } else {
                 tempData.tasks = [];
             }
+            console.log(tempData);
             setUserData(tempData);
         });
     }, [uid]);
@@ -131,6 +133,8 @@ function Tasks(){
         setRole("");
         setSelectedStudent("");
         setSelectedSchool("");
+        setMentorSelect("");
+        setInchargeSelect("");
     }
 
     function handleChange(event) {
