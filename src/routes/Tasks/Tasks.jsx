@@ -128,6 +128,7 @@ function Tasks(){
 
     function showYours() {
         setUID(tempUid);
+        setRole("");
         setSelectedStudent("");
         setSelectedSchool("");
     }
