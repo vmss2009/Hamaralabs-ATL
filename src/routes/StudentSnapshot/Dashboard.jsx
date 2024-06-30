@@ -218,8 +218,6 @@ function StudentsCompetitions(){
             .map((school, index) => {
                 return <option key={index} value={school.name}>{school.name}</option>
             })}
-                 {/*sucharitha 7.3*/}
-                 
                     </select> Student:-
                         <select name="studentSelect" id="studentSelect" value={selectedStudent} onChange={handleOnChange}>
                         <option value="" disabled={true}>SELECT</option>
