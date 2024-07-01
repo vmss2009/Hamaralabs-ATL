@@ -7,7 +7,6 @@ import Dashboard from "./routes/Chats/Dashboard";
 
 const Index = React.lazy(() => import("./routes/Index"));
 const Login = React.lazy(() => import("./routes/Login"));
-const Register = React.lazy(() => import("./routes/Register"));
 
 const StudentForm = React.lazy(() => import("./routes/StudentData/Form"));
 const StudentEditForm = React.lazy(() => import("./routes/StudentData/EditForm"));
@@ -102,10 +101,6 @@ const Router = createBrowserRouter([
         path: "/",
         element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
         errorElement: <Page404 />,
-    },
-    {
-        path: "/register",
-        element: <Register />
     },
     {
         path: "/auth",
