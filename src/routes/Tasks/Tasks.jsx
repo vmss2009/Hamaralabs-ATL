@@ -89,9 +89,7 @@ function Tasks(){
             (async () => {
                 const studentDoc = doc(db, "studentData", selectedStudent);
                 const docData = await getDoc(studentDoc);
-                console.log(docData.data());
                 const studentEmail = docData.data().email;
-                console.log(studentEmail);
                 const q = query(collection(db, "atlUsers"), where("email", "==", studentEmail));
                 onSnapshot(q, (snap) => {
                     snap.forEach((doc) => {
@@ -103,20 +101,22 @@ function Tasks(){
     }, [selectedStudent]);
 
     React.useEffect(() => {
-        const q = query(doc(db, "atlUsers", uid));
-        onSnapshot(q, (snap) => {
-            const tempData = snap.data();
-            tempData.uid = snap.id;
-            if (tempData.tasks !== undefined) {
-                tempData.tasks = tempData.tasks.sort((a, b) => {
-                    return new Date(a.taskDueDate) - new Date(b.taskDueDate);
-                });
-            } else {
-                tempData.tasks = [];
+        (async () => {
+            const q = doc(db, "atlUsers", uid);
+            const docData = await getDoc(q);
+            const tempData = docData.data();
+            if (tempData !== undefined) {
+                if (tempData.tasks !== undefined) {
+                    tempData.tasks = tempData.tasks.sort((a, b) => {
+                        return new Date(a.taskDueDate) - new Date(b.taskDueDate);
+                    });
+                } else {
+                    tempData.tasks = [];
+                }
             }
             console.log(tempData);
             setUserData(tempData);
-        });
+        })();
     }, [uid]);
 
     async function submit() {
@@ -247,13 +247,16 @@ function Tasks(){
             <hr/>
             <div className="subContainer">
                 <h2>{(showWhat === "tasksDone")?"Completed Tasks":"Ongoing Tasks"}</h2>
-                {userData.tasks === undefined || userData.tasks.length === 0 ?
-                    <button className="submitbutton" onClick={() => {setPopupOpen(true)}}><i className="fa-solid fa-plus"></i> Create new task</button>
-                    : (
-                        userData.tasks.map((task, index) => {
-                            return <ReportBox key={index} task={task} done={(showWhat === "tasksDone")} />
-                        })
-                    )}
+                {userData !== undefined ?
+                    userData.tasks === undefined || userData.tasks.length === 0 ?
+                        <button className="submitbutton" onClick={() => {setPopupOpen(true)}}><i className="fa-solid fa-plus"></i> Create new task</button>
+                        : (
+                            userData.tasks.map((task, index) => {
+                                return <ReportBox key={index} task={task} done={(showWhat === "tasksDone")} />
+                            })
+                        )
+                : <div>We encountered a problem, please try again later</div>
+                }
             </div>
         </div>
     );
