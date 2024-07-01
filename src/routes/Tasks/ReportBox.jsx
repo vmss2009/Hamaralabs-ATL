@@ -33,7 +33,7 @@ function ReportBox(props) {
                 });
             }
         });
-    })
+    }, [props.task])
 
     function handleMouseOver(event) {
         setDisplayValue("block");
