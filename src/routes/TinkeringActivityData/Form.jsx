@@ -489,10 +489,10 @@ function TinkeringActivityForm() {
                 </div>
                 <div className="formContainer">
                 <div className="row">
-            <div className="column">
-                    <label htmlFor="introduction"><strong>Introduction: </strong></label>
-                    <br/>
-                    <textarea name="introduction" id="introduction" placeholder="Enter the Introduction" className="form-inp" cols="18" rows="4" value={intro} onChange={handleChange}/>
+                <div className="column">
+                        <label htmlFor="introduction"><strong>Introduction: </strong></label>
+                        <br/>
+                        <textarea name="introduction" id="introduction" placeholder="Enter the Introduction" className="form-inp" cols="18" rows="4" value={intro} onChange={handleChange}/>
                 </div>
             <div className="column">
                     <label><strong>Goals: </strong></label>

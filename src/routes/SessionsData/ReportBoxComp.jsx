@@ -156,16 +156,16 @@ function ReportBox(props) {
                         </select>
 
                         <Select
-                        isMulti
-                        name="colors"
-                        options={studentData}
-                        className="basic-multi-select"
-                        classNamePrefix="select"
-                        onChange={(value) => {setSelectedOptions(value)}}
-                        value={selectedOptions}
-                        formatOptionLabel={formatOptionLabel}
-                        closeMenuOnSelect={false}
-                        hideSelectedOptions={false}
+                            isMulti
+                            name="colors"
+                            options={studentData}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={(value) => {setSelectedOptions(value)}}
+                            value={selectedOptions}
+                            formatOptionLabel={formatOptionLabel}
+                            closeMenuOnSelect={false}
+                            hideSelectedOptions={false}
                         />
 
                         {
@@ -197,9 +197,12 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Type:</span> {props.type}</div>
             <br/>
+            <div className="boxContainer"><span style={{fontWeight: "600"}}>Details:</span> {props.details}</div>
+            <br/>
             <div className="boxContainer">
             <span style={{fontWeight: "600"}}>Prerequisites:</span>
             {props.prerequisites.map((prerequisite, index) => {
+                if(props.prerequisites.length > 2) {
                     if(index === props.prerequisites.length - 1) {
                         return "and "+prerequisite;
                     } else if(index === props.prerequisites.length - 2) {
@@ -207,7 +210,19 @@ function ReportBox(props) {
                     } else {
                         return prerequisite+", "
                     }
-                })}
+                } else {
+                    if (props.prerequisites.length === 1) {
+                        return prerequisite;
+                    } else {
+                        if(index === props.prerequisites.length - 1) {
+                            return " and "+prerequisite;
+                        } else {
+                            return prerequisite+" "
+                        }
+                    
+                    }
+                }
+            })}
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
                 <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>

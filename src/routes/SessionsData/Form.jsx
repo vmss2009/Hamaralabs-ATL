@@ -14,6 +14,7 @@ function Form() {
     const [dateTime, setDateTime] = React.useState("");
     const [duration, setDuration] = React.useState(0);
     const [sessionType, setSessionType] = React.useState("");
+    const [details, setDetails] = React.useState("");
     const [prerequisites, setPrerequisites] = React.useState([]);
     const [prerequisitesLength, setPrerequisitesLength] = React.useState(0);
 
@@ -100,6 +101,8 @@ function Form() {
             setDuration(event.target.value);
         } else if (event.target.name === "sessionType") {
             setSessionType(event.target.value);
+        } else if (event.target.name === "details") {
+            setDetails(event.target.value);
         }
     }
 
@@ -110,13 +113,14 @@ function Form() {
         setDateTime("");
         setDuration(0);
         setSessionType("");
+        setDetails("");
         setPrerequisites([]);
         setPrerequisitesLength(0);
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
-        await addSession(subject, topic, subTopic, dateTime, duration, prerequisites, sessionType)
+        await addSession(subject, topic, subTopic, dateTime, duration, prerequisites, sessionType, details)
             .then(() => {
                 alert("Added successfully!");
                 window.location.href = "/session-data/view";
@@ -286,6 +290,11 @@ function Form() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="formContainer">
+                    <label htmlFor="details"><strong>Details: </strong></label>
+                    <br/>
+                    <textarea name="details" id="details" placeholder="Enter the details" className="form-inp" value={details} onChange={handleChange}/>
                 </div>
                 <div className="formContainer">
                     <label><strong>Prerequisites:</strong> </label>
