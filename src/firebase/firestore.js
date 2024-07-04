@@ -716,7 +716,7 @@ async function updateStudentCourse(courseName, courseTag, description, organized
         applicationStartDate: applStartDate,
         applicationEndDate: applEndDate,
         crsStartDate: crsStartDate,
-        crsEcndDate: crsEndDate,
+        crsEndDate: crsEndDate,
         classesFrom: classesFrom,
         classesTo: classesTo,
         refLink: refLink,
@@ -892,7 +892,7 @@ async function queryPartner(field, comparision, value) {
     return querySnapshot;
 }
 
-async function addSession(subject, topic, subTopic, timestamp, duration, prerequisites, type) {
+async function addSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, details) {
     const docRef = collection(db, sessionPath);
 
     const data = {
@@ -902,7 +902,8 @@ async function addSession(subject, topic, subTopic, timestamp, duration, prerequ
         timestamp: timestamp,
         duration: duration,
         prerequisites: prerequisites,
-        type: type
+        type: type,
+        details: details
     }
 
     await addDoc(docRef, data);
@@ -920,7 +921,7 @@ async function getSession(sessionId) {
     return docSnap;
 }
 
-async function updateSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, sessionId) {
+async function updateSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, details, sessionId) {
     const docRef = doc(db, sessionPath, sessionId);
 
     const data = {
@@ -930,7 +931,25 @@ async function updateSession(subject, topic, subTopic, timestamp, duration, prer
         timestamp: timestamp,
         duration: duration,
         prerequisites: prerequisites,
-        type: type
+        type: type,
+        details: details
+    }
+
+    await setDoc(docRef, data, {merge: true});
+}
+
+async function updateStudentSession(subject, topic, subTopic, timestamp, duration, prerequisites, type, details, sessionId) {
+    const docRef = doc(db, sessionPath, sessionId);
+
+    const data = {
+        subject: subject,
+        topic: topic,
+        subTopic: subTopic,
+        timestamp: timestamp,
+        duration: duration,
+        prerequisites: prerequisites,
+        type: type,
+        details: details,
     }
 
     await setDoc(docRef, data, {merge: true});
@@ -1060,6 +1079,6 @@ export { addCompetition, getCompetitions, getCompetition, updateCompetition, del
 export { addCourse, getCourses, getCourse, updateCourse, deleteCourse, queryCourse, deleteAssignedCourse, updateStudentCourse };
 export { addProject, getProjects, getProject, updateProject, deleteProject, queryProject };
 export { addPartner, getPartners, getPartner, updatePartner, deletePartner, queryPartner };
-export { addSession, getSessions, getSession, updateSession, deleteSession, querySession };
+export { addSession, getSessions, getSession, updateSession, updateStudentSession, deleteSession, querySession };
 export { task, taskAssign, deleteTask, getTasksById };
 export { addSubject, getSubjects, deleteSubject, addTopic, getTopics, deleteTopic, addSubTopic, getSubtopics, deleteSubtopic};

@@ -16,6 +16,7 @@ function SnapshotSessionEditForm() {
     const [dateTime, setDateTime] = React.useState("");
     const [duration, setDuration] = React.useState(0);
     const [sessionType, setSessionType] = React.useState("");
+    const [details, setDetails] = React.useState("");
     const [prerequisites, setPrerequisites] = React.useState([]);
     const [prerequisitesLength, setPrerequisitesLength] = React.useState(0);
 
@@ -33,6 +34,8 @@ function SnapshotSessionEditForm() {
             setDuration(event.target.value);
         } else if (event.target.name === "sessionType") {
             setSessionType(event.target.value);
+        } else if (event.target.name === "details") {
+            setDetails(event.target.value);
         }
     }
 
@@ -43,6 +46,7 @@ function SnapshotSessionEditForm() {
         setDateTime("");
         setDuration(0);
         setSessionType("");
+        setDetails("");
         setPrerequisites([]);
         setPrerequisitesLength(0);
     }
@@ -84,6 +88,7 @@ function SnapshotSessionEditForm() {
             setDateTime(snap.data().timestamp);
             setDuration(parseInt(snap.data().duration));
             setSessionType(snap.data().type);
+            setDetails(snap.data().details);
             setPrerequisites(snap.data().prerequisites);
             setPrerequisitesLength(snap.data().prerequisites.length);
         });
@@ -299,6 +304,11 @@ function SnapshotSessionEditForm() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="formContainer">
+                    <label htmlFor="details"><strong>Details: </strong></label>
+                    <br/>
+                    <textarea name="details" id="details" placeholder="Enter the details" className="form-inp" value={details} onChange={handleChange}/>
                 </div>
                 <div className="formContainer">
                     <label><strong>Prerequisites:</strong> </label>

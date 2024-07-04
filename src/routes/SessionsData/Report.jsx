@@ -164,6 +164,7 @@ function StudentReport() {
                                 timestamp={session.timestamp}
                                 duration={session.duration}
                                 type={session.type}
+                                details={session.details}
                                 prerequisites={session.prerequisites}
                                 students={students}
                                 schools={schools}
@@ -199,6 +200,7 @@ function StudentReport() {
                         timestamp={session.timestamp}
                         duration={session.duration}
                         type={session.type}
+                        details={session.details}
                         prerequisites={session.prerequisites}
                         students={students}
                         schools={schools}

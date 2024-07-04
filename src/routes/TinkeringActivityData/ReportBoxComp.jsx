@@ -308,7 +308,7 @@ function ReportBox(props) {
             }
             </div>
             <br/>
-            <div className="boxContainer"><span style={{fontWeight: "600"}}>Obrvation:</span> <br/> {
+            <div className="boxContainer"><span style={{fontWeight: "600"}}>Observation:</span> <br/> {
                 props.assessment.map((assessment, index) => {
                     return <span key={index}>{index+1}. {assessment} <br/></span>
                 })
@@ -336,14 +336,16 @@ function ReportBox(props) {
             </div>
             <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
                 {role === "atlIncharge" || role === "mentor" || role === "admin" ? 
-                    <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                    <>
+                        <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
+                        <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
+                    </>
                 : ""}
                 {
                     role === "admin" ?
                     <>
                         {email === "mohan@hamaralabs.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
                         <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
-                        <button className="editBtn resetbutton" onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
                         <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
                     </>: ""
                 }
