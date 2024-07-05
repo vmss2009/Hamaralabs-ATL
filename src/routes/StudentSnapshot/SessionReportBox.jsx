@@ -55,15 +55,30 @@ function ReportBox(props) {
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Type:</span> {props.type}</div>
             <br/>
+            <div className="boxContainer"><span style={{fontWeight: "600"}}>Details:</span> {props.details}</div>
+            <br/>
             <div className="boxContainer">
             <span style={{fontWeight: "600"}}>Prerequisites:</span>
                 {props.prerequisites.map((prerequisite, index) => {
-                    if(index === props.prerequisites.length - 1) {
-                        return "and "+prerequisite;
-                    } else if(index === props.prerequisites.length - 2) {
-                        return prerequisite+" ";
+                    if(props.prerequisites.length > 2) {
+                        if(index === props.prerequisites.length - 1) {
+                            return "and "+prerequisite;
+                        } else if(index === props.prerequisites.length - 2) {
+                            return prerequisite+" ";
+                        } else {
+                            return prerequisite+", "
+                        }
                     } else {
-                        return prerequisite+", "
+                        if (props.prerequisites.length === 1) {
+                            return prerequisite;
+                        } else {
+                            if(index === props.prerequisites.length - 1) {
+                                return " and "+prerequisite;
+                            } else {
+                                return prerequisite+" "
+                            }
+                        
+                        }
                     }
                 })}
             </div>
