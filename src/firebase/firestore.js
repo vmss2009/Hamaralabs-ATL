@@ -1014,7 +1014,6 @@ async function addSubject(subName) {
 //     await deleteDoc(docRef);
 // }
 
-// Function to delete a subject from the database
 async function deleteSubject(docId) {
     const docRef = doc(db, "subject", docId);
     const snap = await getDoc(docRef);
