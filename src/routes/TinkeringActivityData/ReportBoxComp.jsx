@@ -223,7 +223,7 @@ function ReportBox(props) {
                     <Popup trigger={assignToOpen} setPopupEnabled={setAssignToOpen} closeAllowed={true}>
                         <div className="container" style={{ fontSize: "1.2rem" }}>
                         Assign to School:
-                        <select name="schoolSelect" onChange={e => {setCheckBox(schools[e.target.options.selectedIndex].isATL ? false : true); setSchool(e.target.value)}} value={school}>
+                        <select name="schoolSelect" onChange={e => {setCheckBox(schools[e.target.options.selectedIndex - 1].isATL ? false : true); setSchool(e.target.value)}} value={school}>
                         <option value="" disabled={true}>SELECT</option>
                         {schools
                             .filter((school, index) => {

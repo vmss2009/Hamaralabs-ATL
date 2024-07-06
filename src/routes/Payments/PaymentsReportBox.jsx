@@ -183,6 +183,19 @@ function PaymentReportBox(props) {
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction time:</span> {props.data.timestamp}</div>
                 </div>
             );
+        } else if (props.data.type === "onBoarding") {
+            return (
+                <div className="box" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} style={{backgroundColor: props.data.status === "success" ? "#ccffcc" : "#ffcccc"}}>
+                    <div className="name" style={{fontSize: "1.5rem"}}>Onboard Hamaralabs</div>
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction ID:</span> {props.data.merchantTransactionId}</div>
+                    <br/>
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction status:</span> {props.data.status}</div>
+                    <br/>
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>Amount:</span> {props.data.amount}</div>
+                    <br/>
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction time:</span> {props.data.timestamp}</div>
+                </div>
+            );
         }
     }
 
