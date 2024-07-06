@@ -62,8 +62,8 @@ function Payments() {
         (async () => {
             const userDocData = await getDoc(userDoc);
             if (userDocData.data().purchases !== undefined) {
-                const purchases = userDocData.data().purchases;
-                setPurchaseHistory(purchases.map((item, idx) => purchases[purchases.length - 1 - idx]));
+                const purchaseHistory = userDocData.data().purchases;
+                setPurchaseHistory(purchaseHistory.map((item, idx) => purchaseHistory[purchaseHistory.length - 1 - idx]));
             }
         })();
     }, []);
