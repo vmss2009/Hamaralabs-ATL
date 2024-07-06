@@ -72,33 +72,12 @@ function PaymentReportBox(props) {
                 discountedValue = tinkeringActivityAmount - discount.discount
             else
                 discountedValue = tinkeringActivityAmount - (tinkeringActivityAmount * discount.discount/100)
-            await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/paymentIntegration/initiateTransaction", {
-                merchantTransactionId: merchantTransactionId,
-                merchantUserId: merchantUserId,
-                amount: discountedValue,
-                redirectUrl: `https://app.hamaralabs.com/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
-
-            })
-            .then((res) => {
-                console.log(res);
-                console.log(res.data);
-                props.setLoading(false);
-                window.location.href = res.data.url.data.instrumentResponse.redirectInfo.url;
-            })
+                const redirectUrl = `https://app.hamaralabs.com/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
+                window.location.href = `https://hamaralabs.com/payment/checkout?amount=${discountedValue}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${redirectUrl}`;
         } else {
             console.log(tinkeringActivityAmount);
-            await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/paymentIntegration/initiateTransaction", {
-                merchantTransactionId: merchantTransactionId,
-                merchantUserId: merchantUserId,    
-                amount: tinkeringActivityAmount,
-                redirectUrl: `https://app.hamaralabs.com/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}"
-            })
-            .then((res) => {
-                console.log(res);
-                console.log(res.data);
-                props.setLoading(false);
-                window.location.href = res.data.url.data.instrumentResponse.redirectInfo.url;
-            })
+            const redirectUrl = `https://app.hamaralabs.com/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
+            window.location.href = `https://hamaralabs.com/payment/checkout?amount=${tinkeringActivityAmount}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${redirectUrl}`;
         }
     }
 
