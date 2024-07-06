@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import axios from "axios";
 import {Bars} from "react-loader-spinner";
 import {db} from "../../firebase/firestore";
-import {doc, getDoc, setDoc, updateDoc, collection, onSnapshot, query, where} from "firebase/firestore";
+import {doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where} from "firebase/firestore";
 import PaymentReportBox from "./PaymentsReportBox"
 import { useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -41,31 +41,36 @@ function Payments() {
     }
 
     useEffect(() => {
+        const fetchData = async () => {
         const studentDataQuery = query(collection(db, "studentData"), where("email", "==", email));
-        onSnapshot(studentDataQuery, (studentQuerySnapshot) => {
-            studentQuerySnapshot.forEach(snap => {
-                window.docId = snap.id;
-                const qTa = query(collection(db, "studentData", snap.id, "taData"), where("paymentInfo.status", "==", "pending"));
-                onSnapshot(qTa, (taQuerySnapshot) => {
-                    const dataArray = [];
-                    taQuerySnapshot.forEach(taSnap => {
-                        const temp = taSnap.data();
-                        temp.docId = taSnap.id;
-                        temp.type = "tinkeringActivity";
-                        dataArray.push(temp);
-                    });
-                    setPaymentsData(...paymentsData, dataArray);
-                });
+        const studentQuerySnapshot = await getDocs(studentDataQuery);
+        const allDataArray = []; // Temporary array to hold all data
+
+        for (const snap of studentQuerySnapshot.docs) {
+            window.docId = snap.id; // Consider avoiding global variables
+            const qTa = query(collection(db, "studentData", snap.id, "taData"), where("paymentInfo.status", "==", "pending"));
+            const taQuerySnapshot = await getDocs(qTa);
+
+            taQuerySnapshot.forEach(taSnap => {
+                const temp = taSnap.data();
+                temp.docId = taSnap.id;
+                temp.type = "tinkeringActivity";
+                allDataArray.push(temp);
             });
-        });
+        }
+
+        setPaymentsData([...paymentsData, ...allDataArray]); // Update state with all fetched data
+
+        // Fetch user document data
         const userDoc = doc(db, "atlUsers", uid);
-        (async () => {
-            const userDocData = await getDoc(userDoc);
-            if (userDocData.data().purchases !== undefined) {
-                const purchaseHistory = userDocData.data().purchases;
-                setPurchaseHistory(purchaseHistory.map((item, idx) => purchaseHistory[purchaseHistory.length - 1 - idx]));
-            }
-        })();
+        const userDocData = await getDoc(userDoc);
+        if (userDocData.exists() && userDocData.data().purchases !== undefined) {
+            const purchaseHistory = userDocData.data().purchases;
+            // Process purchaseHistory as needed
+        }
+    };
+
+    fetchData().catch(console.error); // Execute the async function and catch any errors
     }, []);
 
     useEffect(() => {
