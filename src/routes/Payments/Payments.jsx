@@ -65,8 +65,9 @@ function Payments() {
         const userDoc = doc(db, "atlUsers", uid);
         const userDocData = await getDoc(userDoc);
         if (userDocData.exists() && userDocData.data().purchases !== undefined) {
-            const purchaseHistory = userDocData.data().purchases;
+            const purchaseHistoryTemp = userDocData.data().purchases;
             // Process purchaseHistory as needed
+            setPurchaseHistory(purchaseHistoryTemp);
         }
     };
 
