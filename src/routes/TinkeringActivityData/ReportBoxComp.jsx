@@ -1,5 +1,6 @@
 import React from "react";
-import {doc, getDoc, setDoc} from "firebase/firestore";
+import {doc, getDoc, setDoc, query, where, collection, getDocs} from "firebase/firestore";
+import Plan from "../../accessPlans";
 import db, {addActivity} from "../../firebase/firestore";
 import axios from "axios";
 import Select from 'react-select';
@@ -31,7 +32,7 @@ function ReportBox(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <input
             type="checkbox"
-            checked={selectedOptions.some(option => option.value === value)}
+            checked={selectedOptions.some(option => option.value.docId === value.docId)}
             style={{ marginRight: '8px' }}
             readOnly
           />
@@ -103,12 +104,26 @@ function ReportBox(props) {
         const currentDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
     
         const assignPromises = selectedOptions.map(async (selectedStudent) => {
-            const assignToStudent = selectedStudent.value;
+            const assignToStudent = selectedStudent.value.docId;
+            const studentEmail = selectedStudent.value.email;
+            const studentDataQuery = query(collection(db, "atlUsers"), where("email", "==", studentEmail));
+            const studentQuerySnapshot = await getDocs(studentDataQuery);
+
+            let paymentRequired = checkBox;
             const assignPathDocRef = doc(db, "studentData", assignToStudent, "taData", props.docId);
             const data = taData.data();
-    
+            const studentDataPlan = studentQuerySnapshot.docs[0].data().plan;
+
+            if (studentDataPlan !== undefined) {
+                studentDataPlan.forEach((plan) => {
+                    if (Plan[plan].includes("tinkeringActivity")) {
+                        paymentRequired = false;
+                    }
+                });
+            }
+
             data.status = [{ status: "Assigned", modifiedAt: currentDate }];
-            data.paymentRequired = checkBox;
+            data.paymentRequired = paymentRequired;
             data.paymentInfo = {
                 status: "pending",
                 amount: 50,
@@ -139,13 +154,14 @@ function ReportBox(props) {
             if(student.school === school) {
                 temp.push(student);
             }
-        });const sortedStudents = temp
+        });
+        const sortedStudents = temp
         .sort((a, b) =>
             a.name.firstName.localeCompare(b.name.firstName) ||
             a.name.lastName.localeCompare(b.name.lastName)
         )
         .map((value, index) => ({
-            value: value.docId,
+            value: value,
             label: `${value.name.firstName} ${value.name.lastName}`,
         }));
     setStudentData(sortedStudents);
@@ -235,9 +251,8 @@ function ReportBox(props) {
                             }
                             return false;
                             })
-                            .sort((a, b) => a.name.localeCompare(b.name)) // Sort the schools alphabetically
-                            .map((school, index) => (
-                            <option key={index} value={school.name}>
+                            .map((school, _) => (
+                            <option value={school.name}>
                                 {school.name}
                             </option>
                             ))}
