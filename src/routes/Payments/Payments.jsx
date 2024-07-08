@@ -52,10 +52,12 @@ function Payments() {
             const taQuerySnapshot = await getDocs(qTa);
 
             taQuerySnapshot.forEach(taSnap => {
-                const temp = taSnap.data();
-                temp.docId = taSnap.id;
-                temp.type = "tinkeringActivity";
-                allDataArray.push(temp);
+                if(taSnap.data().patmentRequired) {
+                    const temp = taSnap.data();
+                    temp.docId = taSnap.id;
+                    temp.type = "tinkeringActivity";
+                    allDataArray.push(temp);
+                }
             });
         }
 
