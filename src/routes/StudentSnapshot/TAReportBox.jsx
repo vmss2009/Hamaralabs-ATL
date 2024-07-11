@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 function ReportBox(props) {
     const [displayValue, setDisplayValue] = React.useState("none");
 
-    const [status, setStatus] = React.useState(props.status[props.status.length-1]);
+    const [status, setStatus] = React.useState("");
     const [popupOpen, setPopupOpen] = React.useState(false);
     const files = props.uploadFile;
 
@@ -32,22 +32,26 @@ function ReportBox(props) {
     }
 
     async function modifyStatus(event) {
-        const docRef = doc(db, "studentData", props.studentId, "taData", props.taID);
-        const docSnap = await getDoc(docRef);
-        const d = new Date();
-        const currentDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-        const statusData = [...docSnap.data().status, {status: status, modifiedAt: currentDate}];
-        await setDoc(docRef, {
-            status: statusData
-        }, {merge: true});
-        const userDocRef = doc(db, "studentData", props.studentId);
-        const userData = await getDoc(userDocRef);
-        console.log(userData.data());
-        if (status === "TA Completed") {
-            await notificationsToAdmins("TA Completed", `${userData.data().name.firstName} ${userData.data().name.lastName} from ${userData.data().school} changed status of ${props.taName}`);
+        if (status !== "") {
+            const docRef = doc(db, "studentData", props.studentId, "taData", props.taID);
+            const docSnap = await getDoc(docRef);
+            const d = new Date();
+            const currentDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+            const statusData = [...docSnap.data().status, {status: status, modifiedAt: currentDate}];
+            await setDoc(docRef, {
+                status: statusData
+            }, {merge: true});
+            setStatus("");
+            const userDocRef = doc(db, "studentData", props.studentId);
+            const userData = await getDoc(userDocRef);
+            if (status === "TA Completed") {
+                await notificationsToAdmins("TA Completed", `${userData.data().name.firstName} ${userData.data().name.lastName} from ${userData.data().school} changed status of ${props.taName}`);
+            }
+            alert("Modified");
+            setPopupOpen(false);
+        } else {
+            alert("Please select a status");
         }
-        alert("Modified");
-        setPopupOpen(false);
     }
 
     function handleMouseOver(event) {
@@ -90,29 +94,30 @@ function ReportBox(props) {
                         <div className="formContainer">
                             <label htmlFor="status">Status: </label>
                             <select name="status" id="status" onChange={e => setStatus(e.target.value)} value={status}>
+                                <option value="" >Select</option>
                                 {
-                                    props.status[props.status.length-1] !== "On Hold" ? <option value="On Hold">On Hold</option> : ""
+                                    props.status[props.status.length-1].status !== "On Hold" ? <option value="On Hold">On Hold</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "Mentor Needed"? <option value="Mentor Needed">Mentor Needed</option> : ""
+                                    props.status[props.status.length-1].status !== "Mentor Needed"? <option value="Mentor Needed">Mentor Needed</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "Started Completing"? <option value="Started Completing">Started Completing</option> : ""
+                                    props.status[props.status.length-1].status !== "Started Completing"? <option value="Started Completing">Started Completing</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "Ongoing" ? <option value="Ongoing">Ongoing</option> : ""
+                                    props.status[props.status.length-1].status !== "Ongoing" ? <option value="Ongoing">Ongoing</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "Nearly Completed" ? <option value="Nearly Completed">Nearly Completed</option> : ""
+                                    props.status[props.status.length-1].status !== "Nearly Completed" ? <option value="Nearly Completed">Nearly Completed</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "In Review" ? <option value="In Review">In Review</option> : ""
+                                    props.status[props.status.length-1].status !== "In Review" ? <option value="In Review">In Review</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "Review Completed"? <option value="Review Completed">Review Completed</option> : ""
+                                    props.status[props.status.length-1].status !== "Review Completed"? <option value="Review Completed">Review Completed</option> : ""
                                 }
                                 {
-                                    props.status[props.status.length-1] !== "TA Completed" ? <option value="TA Completed">TA Completed</option> : ""
+                                    props.status[props.status.length-1].status !== "TA Completed" ? <option value="TA Completed">TA Completed</option> : ""
                                 }
                             </select>
                             <br/>

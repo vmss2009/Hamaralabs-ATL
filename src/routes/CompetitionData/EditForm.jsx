@@ -115,37 +115,41 @@ function CompRegForm() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!competName.trim()) {
-            alert("Competition Name is mandatory!");
-        } if (hasDuplicates(requirements)) {
-            alert("Data has duplicate values!");
-        } else {
-            if(file === null) {
-                try {
-                    await updateCompetition(competitionId, competName, description, organizedBy, applStartDate, applEndDate, classesFrom, classesTo,  atlSchools, nonAtlSchools, individual, team, refLink, requirements, paymentDetails, compStartDate, compEndDate)
-                        .then(() => {
-                            alert("Updated Successfully!");
-                            clearForm();
-                            window.location.href = "/competition-data/view";
-                        })
-                } catch (error) {
-                    console.error("Error updating competition: ", error);
-                    alert("Couldn't add the data. Please try again!");
-                }
+        if (requirements.length !== 0) {
+            if (!competName.trim()) {
+                alert("Competition Name is mandatory!");
+            } if (hasDuplicates(requirements)) {
+                alert("Data has duplicate values!");
             } else {
-                try {
-                    const url = await uploadFile();
-                    await updateCompetition(competitionId, competName, description, organizedBy, applStartDate, applEndDate, classesFrom, classesTo,  atlSchools, nonAtlSchools, individual, team, refLink, requirements, paymentDetails, compStartDate, compEndDate, url)
-                        .then(() => {
-                            alert("Updated Successfully!");
-                            clearForm();
-                            window.location.href = "/competition-data/view";
-                        })
-                } catch (error) {
-                    console.error("Error adding competition: ", error);
-                    alert("Couldn't update the data. Please try again!");
+                if(file === null) {
+                    try {
+                        await updateCompetition(competitionId, competName, description, organizedBy, applStartDate, applEndDate, classesFrom, classesTo,  atlSchools, nonAtlSchools, individual, team, refLink, requirements, paymentDetails, compStartDate, compEndDate)
+                            .then(() => {
+                                alert("Updated Successfully!");
+                                clearForm();
+                                window.location.href = "/competition-data/view";
+                            })
+                    } catch (error) {
+                        console.error("Error updating competition: ", error);
+                        alert("Couldn't add the data. Please try again!");
+                    }
+                } else {
+                    try {
+                        const url = await uploadFile();
+                        await updateCompetition(competitionId, competName, description, organizedBy, applStartDate, applEndDate, classesFrom, classesTo,  atlSchools, nonAtlSchools, individual, team, refLink, requirements, paymentDetails, compStartDate, compEndDate, url)
+                            .then(() => {
+                                alert("Updated Successfully!");
+                                clearForm();
+                                window.location.href = "/competition-data/view";
+                            })
+                    } catch (error) {
+                        console.error("Error adding competition: ", error);
+                        alert("Couldn't update the data. Please try again!");
+                    }
                 }
             }
+        } else {
+            alert("Please enter the requirements!");
         }
     }
 

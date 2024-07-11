@@ -106,6 +106,7 @@ function ReportBox(props) {
         const assignPromises = selectedOptions.map(async (selectedStudent) => {
             const assignToStudent = selectedStudent.value.docId;
             const studentEmail = selectedStudent.value.email;
+            console.log(selectedStudent.value);
             const studentDataQuery = query(collection(db, "atlUsers"), where("email", "==", studentEmail));
             const studentQuerySnapshot = await getDocs(studentDataQuery);
 
@@ -142,6 +143,7 @@ function ReportBox(props) {
         Promise.all(assignPromises)
             .then(() => {
                 alert("Assigned!");
+                setSelectedOptions([]);
             })
             .catch(() => {
                 alert("An error occurred while assigning the TA. Please try again later.");
