@@ -109,39 +109,43 @@ function CompRegForm() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!competName.trim()) {
-            alert("Competition Name is mandatory!");
-        } else if (hasDuplicates(requirements) || hasDuplicates(refLink)) {
-            alert("Data has duplicate values!");
-        } else {
-            try {
-                const fileUrls = await Promise.all(selectedFiles.map(uploadFile));
-                await addCompetition(
-                    competName,
-                    description,
-                    organizedBy,
-                    applStartDate,
-                    applEndDate,
-                    classesFrom,
-                    classesTo,
-                    atlSchools,
-                    nonAtlSchools,
-                    individual,
-                    team,
-                    refLink,
-                    requirements,
-                    paymentDetails,
-                    compStartDate,
-                    compEndDate,
-                    fileUrls
-                );
-                alert("Added Successfully!");
-                clearForm();
-                window.location.href = "/competition-data/view";
-            } catch (error) {
-                console.error("Error adding competition: ", error);
-                alert("Adding data failed! Please try again.");
+        if (requirements.length !== 0) {
+            if (!competName.trim()) {
+                alert("Competition Name is mandatory!");
+            } else if (hasDuplicates(requirements) || hasDuplicates(refLink)) {
+                alert("Data has duplicate values!");
+            } else {
+                try {
+                    const fileUrls = await Promise.all(selectedFiles.map(uploadFile));
+                    await addCompetition(
+                        competName,
+                        description,
+                        organizedBy,
+                        applStartDate,
+                        applEndDate,
+                        classesFrom,
+                        classesTo,
+                        atlSchools,
+                        nonAtlSchools,
+                        individual,
+                        team,
+                        refLink,
+                        requirements,
+                        paymentDetails,
+                        compStartDate,
+                        compEndDate,
+                        fileUrls
+                    );
+                    alert("Added Successfully!");
+                    clearForm();
+                    window.location.href = "/competition-data/view";
+                } catch (error) {
+                    console.error("Error adding competition: ", error);
+                    alert("Adding data failed! Please try again.");
+                }
             }
+        } else {
+            alert("Please enter the requirements!");
         }
     }
 
