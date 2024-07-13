@@ -50,6 +50,8 @@ const SessionForm = React.lazy(() => import("./routes/SessionsData/Form"));
 const SessionReport = React.lazy(() => import("./routes/SessionsData/Report"));
 const SessionEditForm = React.lazy(() => import("./routes/SessionsData/EditForm"));
 
+const SlotManagement = React.lazy(() => import("./routes/SlotManagement/SlotManagement"));
+
 const Tasks = React.lazy(() => import("./routes/Tasks/Tasks"));
 const TaskEditForm = React.lazy(() => import("./routes/Tasks/EditForm"));
 
@@ -306,6 +308,15 @@ const Router = createBrowserRouter([
             {
                 path: "edit/:sessionId",
                 element: <AccessDeterminer accessForName="sessionForm" accessForComponent={SessionEditForm} />
+            }
+        ]
+    },
+    {
+        path: "/slot-management",
+        children: [
+            {
+                path: "manage",
+                element: <AccessDeterminer accessForName="slotManagement" accessForComponent={SlotManagement} />
             }
         ]
     },
