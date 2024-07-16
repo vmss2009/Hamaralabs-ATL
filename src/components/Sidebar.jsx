@@ -83,7 +83,7 @@ function Sidebar() {
                     <div className="subTitle"><li className="nav-item">Slot Management</li></div>
                     {role === "admin" || role === "atlIncharge" ?
                     <div className="subContent">
-                        <Link to="/slot-management/manage"><li className="nav-item last-li">Session Data Form</li></Link>
+                        <Link to="/slot-management/manage"><li className="nav-item last-li">Slot Management Form</li></Link>
                     </div>
                     : "" }
                     {role !== "student" ? <><div className="subTitle"><li className="nav-item">Teams</li></div>
