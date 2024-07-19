@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import DateAndTimePicker from "./DateAndTimePicker";
-import { collection, query, onSnapshot } from "firebase/firestore";
-import { db, createSlot } from "../../firebase/firestore";
+import { collection, query, onSnapshot, getDoc } from "firebase/firestore";
+import { db, createSlot, updateSlot } from "../../firebase/firestore";
 
 function SlotManagement () {
     const [school, setSchool] = useState({});
@@ -10,6 +10,7 @@ function SlotManagement () {
     const [slotData, setSlotData] = useState([]);
     const [slotNumber, setSlotNumber] = useState(0);
     const [daysInMonth, setDaysInMonth] = React.useState(0);
+    const [isSlotData, setIsSlotData] = useState(false);
     const [address, setAddress] = useState("");
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
@@ -31,34 +32,95 @@ function SlotManagement () {
     }
 
     useEffect(() => {
-        if (role === "atlIncharge") {
         const q = query(collection(db, "schoolData"));
-            onSnapshot(q, snaps => {
-                snaps.forEach(snap => {
-                    const temp = snap.data();
-                    if(temp.atlIncharge.email === email) {
-                        temp.docId = snap.id;
-                        setSchool(temp);
-                    }
-                });
+        onSnapshot(q, snaps => {
+            snaps.forEach(snap => {
+                const temp = snap.data();
+                if(temp.atlIncharge.email === email && role === "atlIncharge") {
+                    temp.docId = snap.id;
+                    setSchool(temp);
+                }
+                const docRef = temp.slotManagement;
+                if(docRef !== undefined) {
+                    setIsSlotData(true);
+                    (async () => {
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            setSlotNumber(data.slotNumber);
+                            setMonth(data.month);
+                            setAddress(data.address.addressLine1);
+                            setCity(data.address.city);
+                            setState(data.address.state);
+                            setPincode(data.address.pincode);
+                        }
+                    })()
+                }
             });
-        }
+        });
     }, []);
+
+    useEffect(() => {
+        const selectedDate = new Date(Date.parse(month + " 1, 2023"));
+        const monthNumber = selectedDate.getMonth() + 1;
+        const selectedYear = selectedDate.getFullYear(); // Year from the selected month
+
+        const days = getDaysInMonth(monthNumber, selectedYear);
+
+        setDaysInMonth(days);
+    }, [month]);
+
+    const resetForm = async () => {
+        const docRef = school.slotManagement;
+        const docSnap = await getDoc(docRef);
+        const data = docSnap.data();
+        setSlotNumber(data.slotNumber);
+        setMonth(data.month);
+        setAddress(data.address.addressLine1);
+        setCity(data.address.city);
+        setState(data.address.state);
+        setPincode(data.address.pincode);
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const allotedSlots = handleAllotedSlots(slotData);
         if (month !== "" || address !== "" || city !== "" || state !== "" || pincode !== "") {
-            await createSlot(school.docId, slotNumber, month, slotData, address, city, state, pincode)
-            .then(() => {
-                alert("Added Successfully!");
-                // clearForm();
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Couldn't add the data. Please try again!" + error);
-            });
+            if (isSlotData) {
+                await updateSlot(school.slotManagement, slotNumber, month, slotData, allotedSlots, address, city, state, pincode)
+                .then(() => {
+                    alert("Update Successfully!");
+                    // clearForm();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("Couldn't add the data. Please try again!" + error);
+                });
+            } else {
+                await createSlot(school.docId, slotNumber, month, slotData, allotedSlots, address, city, state, pincode)
+                .then(() => {
+                    alert("Added Successfully!");
+                    // clearForm();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("Couldn't add the data. Please try again!" + error);
+                });
+            }
         }
-        console.log(slotData);
+    }
+
+    function handleAllotedSlots (data) {
+        const tempData = data;
+        for (let i = 1; i <= Object.keys(data).length; i++) {
+            for (let j = 1; j <= Object.keys(data[i]).length; j++) {
+                if (data[i][j] === true) {
+                    tempData[i][j] = [];
+                }
+            }
+        }
+        console.log(tempData);
+        return tempData;
     }
 
     const handleChange = (event) => {
@@ -68,13 +130,6 @@ function SlotManagement () {
             setSlotNumber(parseInt(event.target.value));
         } else if (event.target.name === "month") {
             setMonth(event.target.value);
-            const selectedDate = new Date(Date.parse(event.target.value + " 1, 2023"));
-            const monthNumber = selectedDate.getMonth() + 1;
-            const selectedYear = selectedDate.getFullYear(); // Year from the selected month
-    
-            const days = getDaysInMonth(monthNumber, selectedYear);
-    
-            setDaysInMonth(days);
         } else if (event.target.name === "address") {
             setAddress(event.target.value);
         } else if (event.target.name === "city") {
@@ -99,7 +154,6 @@ function SlotManagement () {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     
-    // Sort months starting from the current month
     const sortedMonths = [
       ...months.slice(currentMonth),
       ...months.slice(0, currentMonth)
@@ -146,7 +200,7 @@ function SlotManagement () {
                 </div>
                 <div className="formContainer">
                     <label htmlFor="teamLeader"><strong>Slot:</strong> </label>
-                    <DateAndTimePicker days={daysInMonth === 0 ? 30 : daysInMonth} slotData={slotData} setSlotData={setSlotData} />
+                    <DateAndTimePicker days={daysInMonth === 0 ? 30 : daysInMonth} setSlotData={setSlotData} />
                 </div>
                 <div className="formContainer">
                     <label><strong>School Address: </strong></label>
@@ -213,8 +267,8 @@ function SlotManagement () {
                         </div>
                     </div><br/>
                     <div className="buttonsContainer formContainer">
-                        <button type="submit" className="submitbutton" onClick={handleSubmit} >Add</button>
-                        <button type="reset" className="resetbutton">Reset</button>
+                        <button type="submit" className="submitbutton" onClick={handleSubmit} >Add / Update</button>
+                        <button type="reset" className="resetbutton" onClick={resetForm}>Reset</button>
                     </div>
                 </div>
             </form>

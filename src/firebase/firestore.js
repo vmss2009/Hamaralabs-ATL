@@ -970,8 +970,7 @@ async function querySession(field, comparision, value) {
     return querySnapshot;
 }
 
-async function createSlot(schoolId, slotNumber, month, slotData, addressLine, city, state, pincode) {
-    
+async function createSlot(schoolId, slotNumber, month, slotData, allotedSlots, addressLine, city, state, pincode) {
     const schoolDoc = doc(db, "schoolData", schoolId);
     const docRef = collection(db, "schoolData", schoolId, "slotManagement");
     console.log(docRef);
@@ -981,6 +980,7 @@ async function createSlot(schoolId, slotNumber, month, slotData, addressLine, ci
         slotNumber: parseInt(slotNumber),
         month: month,
         slot: slotData,
+        allotedSlots: allotedSlots,
         address: {
             addressLine1: addressLine,
             city: city,
@@ -996,13 +996,14 @@ async function createSlot(schoolId, slotNumber, month, slotData, addressLine, ci
     }, {merge: true});
 }
 
-async function updateSlot(schoolId, slotId, slotNumber, month, slotData, addressLine, city, state, pincode) {
-    const schoolDoc = doc("schoolData", schoolId, "slotManagement", slotId);
+async function updateSlot(slotRef, slotNumber, month, slotData, allotedSlots, addressLine, city, state, pincode) {
+    const schoolDoc = slotRef;
 
     const data = {
         slotNumber: parseInt(slotNumber),
         month: month,
         slot: slotData,
+        allotedSlots: allotedSlots,
         address: {
             addressLine1: addressLine,
             city: city,

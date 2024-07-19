@@ -12,7 +12,7 @@ const generateInitialState = (rows, cols) => {
   return state;
 };
 
-const DateAndTimePicker = ({ days, slotData, setSlotData }) => {
+const DateAndTimePicker = ({ days, setSlotData }) => {
   const rows = days;
   const cols = 10;
   const [checked, setChecked] = useState(generateInitialState(rows, cols));
