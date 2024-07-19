@@ -80,6 +80,8 @@ function AccessDeterminer(props) {
             temp = "Chats";
         } else if (props.accessForName === "chatWithAdmin") {
             temp = "Chat with Admin";
+        } else if (props.accessForName === "slotManagement") {
+            temp = "Slot Management";
         }
 
         if(AccessObject[props.accessForName].includes(role)) {

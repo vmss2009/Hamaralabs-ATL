@@ -970,6 +970,70 @@ async function querySession(field, comparision, value) {
     return querySnapshot;
 }
 
+async function createSlot(schoolId, slotNumber, month, slotData, allotedSlots, addressLine, city, state, pincode) {
+    const schoolDoc = doc(db, "schoolData", schoolId);
+    const docRef = collection(db, "schoolData", schoolId, "slotManagement");
+    console.log(docRef);
+
+
+    const data = {
+        slotNumber: parseInt(slotNumber),
+        month: month,
+        slot: slotData,
+        allotedSlots: allotedSlots,
+        address: {
+            addressLine1: addressLine,
+            city: city,
+            state: state,
+            pincode: pincode
+        }
+    }
+
+    const slot = await addDoc(docRef, data);
+
+    await setDoc(schoolDoc, {
+        slotManagement: slot
+    }, {merge: true});
+}
+
+async function updateSlot(slotRef, slotNumber, month, slotData, allotedSlots, addressLine, city, state, pincode) {
+    const schoolDoc = slotRef;
+
+    const data = {
+        slotNumber: parseInt(slotNumber),
+        month: month,
+        slot: slotData,
+        allotedSlots: allotedSlots,
+        address: {
+            addressLine1: addressLine,
+            city: city,
+            state: state,
+            pincode: pincode
+        }
+    }
+
+    await updateDoc(schoolDoc, data);
+}
+
+async function deleteSlot(schoolId, slotId) {
+    const schoolDoc = doc("schoolData", schoolId);
+    const slotDoc = doc("schoolData", schoolId, "slotManagement", slotId);
+
+    await deleteDoc(slotDoc);
+
+    await setDoc(schoolDoc, {
+        slotManagement: ""
+    }, {merge: true});
+}
+
+async function getSlot(field, comparision, value) {
+    const ref = collection(db, "schoolData");
+    const q = await query(ref, where(field, comparision, value));
+    const querySnapshot = await getDocs(q);
+    const slotDoc = querySnapshot.docs[0].data().slotManagement;
+    return slotDoc;
+}
+
 async function deleteAssignedTA(docId, taskId) {
     const docRef = doc(db, studentPath, docId, "taData", taskId);
     const snap = await getDoc(docRef);
@@ -1079,5 +1143,6 @@ export { addCourse, getCourses, getCourse, updateCourse, deleteCourse, queryCour
 export { addProject, getProjects, getProject, updateProject, deleteProject, queryProject };
 export { addPartner, getPartners, getPartner, updatePartner, deletePartner, queryPartner };
 export { addSession, getSessions, getSession, updateSession, updateStudentSession, deleteSession, querySession };
+export { createSlot, updateSlot, deleteSlot, getSlot };
 export { task, taskAssign, deleteTask, getTasksById };
 export { addSubject, getSubjects, deleteSubject, addTopic, getTopics, deleteTopic, addSubTopic, getSubtopics, deleteSubtopic};
