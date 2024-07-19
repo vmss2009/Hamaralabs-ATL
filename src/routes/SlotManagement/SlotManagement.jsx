@@ -203,6 +203,10 @@ function SlotManagement () {
                     <label htmlFor="teamLeader"><strong>Slot:</strong> </label>
                     <DateAndTimePicker days={daysInMonth === 0 ? 30 : daysInMonth} setSlotData={setSlotData} />
                 </div>
+                <div className="buttonsContainer formContainer">
+                    <button type="submit" className="submitbutton" onClick={handleSubmit} >Add / Update</button>
+                    <button type="reset" className="resetbutton" onClick={resetForm}>Reset</button>
+                </div>
             </form>
         </div>
     );
