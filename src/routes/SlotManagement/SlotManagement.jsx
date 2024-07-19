@@ -5,17 +5,14 @@ import { collection, query, onSnapshot, getDoc } from "firebase/firestore";
 import { db, createSlot, updateSlot } from "../../firebase/firestore";
 
 function SlotManagement () {
-    const [school, setSchool] = useState({});
+    const [school, setSchool] = useState([]);
+    const [selectedSchool, setSelectedSchool] = useState("");
+    const [selectedSchoolIndex, setSelectedSchoolIndex] = useState(null);
     const [month, setMonth] = useState("");
     const [slotData, setSlotData] = useState([]);
     const [slotNumber, setSlotNumber] = useState(0);
     const [daysInMonth, setDaysInMonth] = React.useState(0);
     const [isSlotData, setIsSlotData] = useState(false);
-    const [address, setAddress] = useState("");
-    const [city, setCity] = useState("");
-    const [state, setState] = useState("");
-    const [pincode, setPincode] = useState("");
-
     let encodedAuth = localStorage.getItem("auth");
     let uid;
     let email;
@@ -34,31 +31,42 @@ function SlotManagement () {
     useEffect(() => {
         const q = query(collection(db, "schoolData"));
         onSnapshot(q, snaps => {
+            const tempData = [];
             snaps.forEach(snap => {
                 const temp = snap.data();
                 if(temp.atlIncharge.email === email && role === "atlIncharge") {
                     temp.docId = snap.id;
-                    setSchool(temp);
-                }
-                const docRef = temp.slotManagement;
-                if(docRef !== undefined) {
-                    setIsSlotData(true);
-                    (async () => {
-                        const docSnap = await getDoc(docRef);
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            setSlotNumber(data.slotNumber);
-                            setMonth(data.month);
-                            setAddress(data.address.addressLine1);
-                            setCity(data.address.city);
-                            setState(data.address.state);
-                            setPincode(data.address.pincode);
-                        }
-                    })()
+                    tempData.push(temp);
+                } else if (role === "admin") {
+                    temp.docId = snap.id;
+                    tempData.push(temp);
                 }
             });
+            setSchool(tempData);
         });
     }, []);
+
+    useEffect(() => {
+        if (selectedSchool !== "") {
+            console.log(school[selectedSchoolIndex]);
+            if (school[selectedSchoolIndex].slotManagement !== undefined) {
+                const docRef = school[selectedSchoolIndex].slotManagement;
+                (async () => {
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        setSlotNumber(data.slotNumber);
+                        setMonth(data.month);
+                    }
+                })();
+                setIsSlotData(true);
+            } else {
+                setIsSlotData(false);
+                setSlotNumber(0);
+                setMonth("");
+            }
+        }
+    }, [selectedSchool]);
 
     useEffect(() => {
         const selectedDate = new Date(Date.parse(month + " 1, 2023"));
@@ -71,23 +79,19 @@ function SlotManagement () {
     }, [month]);
 
     const resetForm = async () => {
-        const docRef = school.slotManagement;
+        const docRef = school[selectedSchoolIndex].slotManagement;
         const docSnap = await getDoc(docRef);
         const data = docSnap.data();
         setSlotNumber(data.slotNumber);
         setMonth(data.month);
-        setAddress(data.address.addressLine1);
-        setCity(data.address.city);
-        setState(data.address.state);
-        setPincode(data.address.pincode);
     }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const allotedSlots = handleAllotedSlots(slotData);
-        if (month !== "" || address !== "" || city !== "" || state !== "" || pincode !== "") {
+        if (selectedSchool !== "" && month !== "") {
             if (isSlotData) {
-                await updateSlot(school.slotManagement, slotNumber, month, slotData, allotedSlots, address, city, state, pincode)
+                await updateSlot(school[selectedSchoolIndex].slotManagement, slotNumber, month, slotData, allotedSlots)
                 .then(() => {
                     alert("Update Successfully!");
                     // clearForm();
@@ -97,16 +101,18 @@ function SlotManagement () {
                     alert("Couldn't add the data. Please try again!" + error);
                 });
             } else {
-                await createSlot(school.docId, slotNumber, month, slotData, allotedSlots, address, city, state, pincode)
+                await createSlot(school[selectedSchoolIndex].docId, slotNumber, month, slotData, allotedSlots)
                 .then(() => {
                     alert("Added Successfully!");
                     // clearForm();
                 })
                 .catch((error) => {
                     console.log(error);
-                    alert("Couldn't add the data. Please try again!" + error);
+                    alert("Couldn't add the data. Please try again!");
                 });
             }
+        } else {
+            alert("Please fill all the fields!");
         }
     }
 
@@ -119,25 +125,18 @@ function SlotManagement () {
                 }
             }
         }
-        console.log(tempData);
+
         return tempData;
     }
 
     const handleChange = (event) => {
         if (event.target.name === "schoolName") {
-            setSchool(event.target.value);
+            setSelectedSchool(event.target.value);
+            setSelectedSchoolIndex(event.target.options.selectedIndex - 1);
         } else if (event.target.name === "slotNumber") {
             setSlotNumber(parseInt(event.target.value));
         } else if (event.target.name === "month") {
             setMonth(event.target.value);
-        } else if (event.target.name === "address") {
-            setAddress(event.target.value);
-        } else if (event.target.name === "city") {
-            setCity(event.target.value);
-        } else if (event.target.name === "state") {
-            setState(event.target.value);
-        } else if (event.target.name === "pincode") {
-            setPincode(event.target.value);
         }
     }
 
@@ -170,9 +169,11 @@ function SlotManagement () {
                     <div className="row">
                         <div className="column">
                             <label htmlFor="schoolName"><strong>School:</strong> </label>
-                            <select name="schoolName" id="schoolName"  placeholder="Enter your School" className="form-inp" value={school} onChange={handleChange}>
+                            <select name="schoolName" id="schoolName"  placeholder="Enter your School" className="form-inp" value={selectedSchool} onChange={handleChange}>
                                 <option value="" disabled>Select School</option>
-                                <option selected value={school.name}>{school.name}</option>
+                                {school.map((school, index) => (
+                                    <option key={index} value={school.name}>{school.name}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -201,75 +202,6 @@ function SlotManagement () {
                 <div className="formContainer">
                     <label htmlFor="teamLeader"><strong>Slot:</strong> </label>
                     <DateAndTimePicker days={daysInMonth === 0 ? 30 : daysInMonth} setSlotData={setSlotData} />
-                </div>
-                <div className="formContainer">
-                    <label><strong>School Address: </strong></label>
-                    <div className="row">
-                        <div className="column">
-                            <label htmlFor="Name">Address line:</label>
-                            <input type ="text" name="address" className="form-inp" placeholder="Enter your address" value={address} id="fname" autoComplete="off"
-                                onChange={handleChange} required/>
-                        </div>
-                        <div className="column">
-                            <label htmlFor="fname">City/District:</label>
-                            <input type ="text" name="city" className="form-inp" placeholder="Enter your city" value={city} id="city" autoComplete="off"
-                            onChange={handleChange} required />
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="column">
-                        <label htmlFor="state">State/province*</label>
-                        <select id="state" name="state" className="form-inp" value={state} onChange={handleChange}>
-                            <option value="" selected={true} disabled={true}>--Select a state/union territory--</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Pradesh">Himachal Pradesh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="North Carolina">North Carolina</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                            <option value="Chandigarh">Chandigarh</option>
-                            <option value="Daman and Diu">Daman and Diu</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                            <option value="Ladakh">Ladakh</option>
-                            <option value="Lakshadweep">Lakshadweep</option>
-                            <option value="Puducherry">Puducherry</option>
-                        </select>
-                    </div>
-                    <div className="column">
-                        <label htmlFor="fname">Pincode:</label>
-                        <input  type ="text" name="pincode" className="form-inp" value={pincode} id="pincode" placeholder="Enter your pincode" autoComplete="off"
-                                onChange= {handleChange} required/>
-                        </div>
-                    </div><br/>
-                    <div className="buttonsContainer formContainer">
-                        <button type="submit" className="submitbutton" onClick={handleSubmit} >Add / Update</button>
-                        <button type="reset" className="resetbutton" onClick={resetForm}>Reset</button>
-                    </div>
                 </div>
             </form>
         </div>
