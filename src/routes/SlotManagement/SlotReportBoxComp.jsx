@@ -37,7 +37,7 @@ function ReportBox(props) {
     return (
         <div className="box" id={props.id} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
             <div className="overlay"></div>
-            <div className="name"><span style={{fontWeight: "600"}}>Date and time: {data?.timePeriod} {data.day}</span></div>
+            <div className="name"><span style={{fontWeight: "600"}}>Date and time: {data.day}, {data?.timePeriod}</span></div>
             <br/>
             <div className="boxContainer"><span style={{fontWeight: "600"}}>Email: {data?.data?.email}</span></div>
             <br/>
