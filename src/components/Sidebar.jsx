@@ -80,6 +80,13 @@ function Sidebar() {
                         <Link to="/session-data/add"><li className="nav-item">Session Data Form</li></Link>
                         <Link to="/session-data/view"><li className="nav-item last-li">Session Data Report</li></Link>
                     </div></> : ""}
+                    <div className="subTitle"><li className="nav-item">Slot Management</li></div>
+                    {role === "admin" || role === "atlIncharge" ?
+                    <div className="subContent">
+                        <Link to="/slot-management/add-update"><li className="nav-item">Slot Management Form</li></Link>
+                        <Link to="/slot-management/manage"><li className="nav-item last-li">Slot Management Report</li></Link>
+                    </div>
+                    : "" }
                     {role !== "student" ? <><div className="subTitle"><li className="nav-item">Teams</li></div>
                     <div className="subContent">
                         <Link to="/team-data/add"><li className="nav-item">Team form</li></Link>

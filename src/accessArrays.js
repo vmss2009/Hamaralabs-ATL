@@ -42,6 +42,8 @@ const partnerReport = ["admin", "atlIncharge"];
 const sessionForm = ["admin", "atlIncharge", "mentor"];
 const sessionReport = ["admin", "atlIncharge", "mentor"];
 
+const slotManagement = ["admin", "atlIncharge"];
+
 const chats = ["admin", "atlIncharge", "mentor", "student"];
 const chatWithAdmin = ["admin", "atlIncharge", "mentor", "student"];
 
@@ -78,6 +80,7 @@ export default {
     partnerReport,
     sessionForm,
     sessionReport,
+    slotManagement,
     competitionSnapshot,
     addFieldsForm,
     chats,
