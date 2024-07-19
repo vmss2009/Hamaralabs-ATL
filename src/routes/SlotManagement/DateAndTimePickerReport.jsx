@@ -24,7 +24,7 @@ const getTimeSlots = (startHour, endHour) => {
   return slots;
 };
 
-const DateAndTimePicker = ({ initialData, setSlotBookings }) => {
+const DateAndTimePicker = ({ initialData, setSlotBookings, slotNumber, month }) => {
   const timeSlots = getTimeSlots(8, 18); // From 8:00 to 18:00
   const datesInMonth = Object.keys(initialData).map((key) => `Day ${key}`);
 
@@ -47,7 +47,7 @@ const DateAndTimePicker = ({ initialData, setSlotBookings }) => {
         if (newChecked[rIndex][cIndex].checked && Array.isArray(newChecked[rIndex][cIndex].value) && newChecked[rIndex][cIndex].value.length > 0) {
           for (let i = 0; i < newChecked[rIndex][cIndex].value.length; i++) {
             selectedArrays.push({
-              day: `Day ${rIndex}`,
+              day: `${rIndex}th ${month}`,
               timePeriod: timeSlots[cIndex - 1], // Adjust the time slot index
               value: newChecked[rIndex][cIndex].value[i],
             });
@@ -61,7 +61,7 @@ const DateAndTimePicker = ({ initialData, setSlotBookings }) => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Select Time Slots
+        Select Time Slots {month !== undefined ? `(for ${month})` : ''}
       </Typography>
       <Grid container spacing={1}>
         <Grid item xs={2}>
@@ -93,7 +93,7 @@ const DateAndTimePicker = ({ initialData, setSlotBookings }) => {
                     />
                   }
                   label={checked[rowIndex] && checked[rowIndex][colIndex + 1] && checked[rowIndex][colIndex + 1].enabled
-                    ? `${checked[rowIndex][colIndex + 1].value.length}`
+                    ? `${checked[rowIndex][colIndex + 1].value.length}/${slotNumber}`
                     : ''}
                 />
               </Grid>
