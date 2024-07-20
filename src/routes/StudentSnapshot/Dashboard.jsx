@@ -4,7 +4,6 @@ import {doc, query, onSnapshot, collection, where} from "firebase/firestore";
 import Sidebar from "../../components/Sidebar";
 import DisplayElement from "./DisplayElement";
 
-
 function StudentsCompetitions(){
     const [currentStudentData, setCurrentStudentData] = React.useState({});
     const [schools, setSchools] = React.useState([]);
@@ -219,8 +218,6 @@ function StudentsCompetitions(){
             .map((school, index) => {
                 return <option key={index} value={school.name}>{school.name}</option>
             })}
-                 {/*sucharitha 7.3*/}
-                 
                     </select> Student:-
                         <select name="studentSelect" id="studentSelect" value={selectedStudent} onChange={handleOnChange}>
                         <option value="" disabled={true}>SELECT</option>
@@ -250,6 +247,9 @@ function StudentsCompetitions(){
                     <div className="tab" onClick={handleTabChange} data-option="tas" style={currentlyViewing === "tas"?activeTabStyles:tabStyles} onMouseOver={handleTabMouseOver} onMouseOut={handleTabMouseOut}>
                         <i className="fa-solid fa-flask-vial"></i> Student Tinkering Activities
                     </div>
+                    <div className="tab" onClick={handleTabChange} data-option="sessions" style={currentlyViewing === "sessions"?activeTabStyles:tabStyles} onMouseOver={handleTabMouseOver} onMouseOut={handleTabMouseOut}>
+                        <i class="fa-solid fa-handshake"></i> Student Sessions
+                    </div>
                 </div>
                 {
                     currentlyViewing !== "" ?
@@ -258,6 +258,7 @@ function StudentsCompetitions(){
                             competitions={currentStudentData.competitions}
                             courses={currentStudentData.courses}
                             studentId={currentStudentData.docId}
+                            uid={uid}
                         /> : ""
                 }
             </div>

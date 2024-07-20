@@ -5,11 +5,11 @@ function Popup(props) {
         props.setPopupEnabled(false);
     }
 
-    document.body.onkeydown = function(event) {
-        if(event.key === "Escape") {
-            props.setPopupEnabled(false);
-        }
-    }
+    // document.body.onkeydown = function(event) {
+    //     if(event.key === "Escape") {
+    //         props.setPopupEnabled(false);
+    //     }
+    // }
 
     return (props.trigger) ? (
         <div className="popup" style={{
@@ -26,10 +26,10 @@ function Popup(props) {
         }}>
             <div className="popup-inner" style={{
                 position: "relative",
-                width: "75%",
-                maxWidth: "75%",
-                height: "60%",
-                maxHeight: "60%",
+                width: props.width || "75%",
+                maxWidth: props.width || "75%",
+                height: props.height || "60%",
+                maxHeight: props.height || "60%",
                 backgroundColor: "#fff",
                 border: "10px solid rgb(137 137 137)",
                 borderRadius: "3rem",

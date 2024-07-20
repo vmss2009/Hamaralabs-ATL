@@ -1,14 +1,15 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 import {query, onSnapshot, doc, collection, setDoc} from "firebase/firestore";
-
+import { ToastContainer, Bounce } from "react-toastify";
 import {db} from "./firebase/firestore";
-
-import lodash from "lodash";
+import 'react-toastify/dist/ReactToastify.css';
 
 import Router from "./Router";
 import HL_Logo from "./HL Sticker.png";
 import LDSLoadingSpinner from "./components/LDSLoadingSpinner";
+import { getFCMToken, onMessageListener } from "./firebase/cloudmessaging"; // Import the missing function
+import 'reactjs-popup/dist/index.css'
 
 let encodedAuth = localStorage.getItem("auth");
 
@@ -33,6 +34,15 @@ if (encodedAuth != null) {
 }
 
 function App() {
+    const [showPopup, setShowPopup] = React.useState(true);
+
+    onMessageListener().then(payload => {
+        const title = payload.notification.title;
+        const body = payload.notification.body;
+        new Notification(title, {body});
+        console.log(payload);
+    }).catch(err => console.log('failed: ', err));
+
     React.useEffect(() => {
         if(localStorage.auth !== null && localStorage.auth !== undefined && localStorage.auth !== "") {
             const q = query(doc(db, "atlUsers", uid));
@@ -94,11 +104,64 @@ function App() {
         //     });
         // });
     }, []);
+    
+    console.log(Notification.permission); 
+
+    if ((Notification.permission === "denied" || Notification.permission === "default") && showPopup === true && localStorage.getItem("auth") !== null && (role === "admin" || role === "mentor")) {
+        return (
+            <div 
+                className="popup-container"
+                style={showPopup ? {
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+                } : { display: 'none' }}>
+                <div 
+                className="popup" 
+                style={{
+                    backgroundColor: '#fff',
+                    minWidth: '300px', // Set a minimum width
+                    maxWidth: '500px', // Optional max width
+                    padding: '30px',   // More padding
+                    borderRadius: '8px',
+                    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.3)' // Stronger shadow
+                }}
+                >
+                <h3>Enable Notifications?</h3> {/* Example heading */}
+                <p>Get updates on new features and important announcements.</p> 
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <button onClick={() => {setShowPopup(false)}}>Later</button> 
+                    <button onClick={async () => {
+                       await getFCMToken();
+                        setShowPopup(false);
+                    }}>Enable</button> 
+                </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
             <React.Suspense fallback={<FallBack />}>
                 <RouterProvider router={Router} />
+                <ToastContainer
+                position="bottom-center"
+                autoClose={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+                transition={Bounce}
+                />
             </React.Suspense>
         </div>
     );

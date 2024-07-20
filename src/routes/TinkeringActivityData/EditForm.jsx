@@ -2,16 +2,20 @@ import React from "react";
 import {doc, onSnapshot, query} from "firebase/firestore";
 
 import {db, updateActivity, getSubjects, getTopics, getSubtopics} from "../../firebase/firestore";
+import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";//newline
 import {useParams} from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
+import fbApp from "../../firebase/app";//newline
+
+const storage = getStorage(fbApp);//newline
 
 function TinkeringActivityForm() {
     const {activityId} = useParams();
 
     const [taID, setTAID] = React.useState("");
     const [taName, setTAName] = React.useState("");
+    const [taNamePermanent, setTaNamePermanent] = React.useState("");
     const [subject, setSubject] = React.useState("");
-    const [subjectID, setSubjectID] = React.useState("");
     const [topic, setTopic] = React.useState("");
     const [subTopic, setSubTopic] = React.useState("");
     const [intro, setIntro] = React.useState("");
@@ -37,10 +41,27 @@ function TinkeringActivityForm() {
     function clearForm() {
     }
 
-    function hasDuplicates(array) {
+    function getFileNameFromUrl(url, operation) {
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/');
+        const encodedFileName = pathSegments[pathSegments.length - 1];
+        let fileName = decodeURIComponent(encodedFileName);
+        fileName = fileName.replace(`tAFiles/${operation}/`, '');
+        return fileName;
+    }
+
+    function hasDuplicates(array, hasFiles) {
+        if (hasFiles === undefined) {
+            hasFiles = false;
+        }
         var valuesSoFar = Object.create(null);
         for (var i = 0; i < array.length; ++i) {
             var value = array[i];
+            if (hasFiles === true) {
+                if (typeof value === "object") {
+                    value = value.name;
+                }
+            }
             if (value in valuesSoFar) {
                 return true;
             }
@@ -67,9 +88,16 @@ function TinkeringActivityForm() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(observations) || hasDuplicates(extensions) || hasDuplicates(resources)) {
+        if(hasDuplicates(goals) || hasDuplicates(materials) || hasDuplicates(instructions) || hasDuplicates(tips) || hasDuplicates(observations) || hasDuplicates(extensions) || hasDuplicates(resources, true)) {
             alert("Data has duplicate values!");
         } else {
+            for (let index = 0; index < resources.length; index++) {
+                if (typeof resources[index] === "object") {
+                    resources[index] = await uploadFile(resources[index]);
+                }
+            }
+            console.log(resources.length);
+            console.log(resources[1]);
             await updateActivity(activityId, taID, taName, subject, topic, subTopic, intro, goals, materials, instructions, tips, observations, extensions, resources)
                 .then(() => {
                     alert("Updated successfully!!");
@@ -198,11 +226,43 @@ function TinkeringActivityForm() {
         setExtensions(temp);
     }
 
-    function mfHandleChangeResources(event) {
-        const index = Number(event.target.getAttribute("id").replace("resource", ""));
+    function mfHandleChangeResources(event, file) {
+        const index = Number(event.target.getAttribute("id").replace(file ? "uploadMou" : "resource", ""));
         const temp = [...resources];
-        temp[index] = event.target.value;
+        if (file) {
+            temp[index] = file;
+            setResourcesCount(resourcesCount+1);
+            console.log(resourcesCount);
+            temp[resourcesCount] = "";
+        } else {
+            temp[index] = event.target.value;
+        }
         setResources(temp);
+    }
+
+    async function uploadFile(file) {
+        try {
+            const filesFolderRef = ref(storage, `tAFiles/${taName}/${file.name}`);
+            const temp2 = await uploadBytes(filesFolderRef, file);
+            const temp = await getDownloadURL(filesFolderRef);
+            console.log(temp2);
+            return temp;
+        } catch (error){
+            console.log(error);
+        }
+    }
+
+    async function onFileSelectResources(event) {
+        event.preventDefault();
+        const selectedFile = event.target.files[0];
+        const fileSizeInMB = selectedFile.size / (1024*1024);
+        
+        if (selectedFile && fileSizeInMB <= 50) {
+            mfHandleChangeResources(event, selectedFile);
+        } else {
+            alert("Please select a file less than 50MB");
+            console.log(resources);
+        }
     }
 
     React.useEffect(() => {
@@ -223,8 +283,10 @@ function TinkeringActivityForm() {
             window.location.reload();
           });
         onSnapshot(q, (snapshot) => {
+            console.log(snapshot.data());
             setTAID(snapshot.data().taID);
             setTAName(snapshot.data().taName);
+            setTaNamePermanent(snapshot.data().taName);
             setSubject(snapshot.data().subject ? snapshot.data().subject : "");
             setTopic(snapshot.data().topic ? snapshot.data().topic : "");
             setSubTopic(snapshot.data().subTopic ? snapshot.data().subTopic : "");
@@ -247,14 +309,13 @@ function TinkeringActivityForm() {
     }, []);
 
     React.useEffect(() => {
-        let id;
-        subjectData.forEach((value, index) => {
-            if (subject === value.name) {
-                id = value.id;
+        let subjectId;
+        for (let index = 0; index < subjectData.length; index++) {
+            if (subject === subjectData[index].name) {
+                subjectId = subjectData[index].id;
             }
-        });
-        setSubjectID(id);
-        getTopics(id || " ")
+        }
+        getTopics(subjectId || " ")
         .then((docSnaps) => {
             const dataArray = [];
             docSnaps.forEach((docSnap) => {
@@ -264,33 +325,30 @@ function TinkeringActivityForm() {
                   };
                 dataArray.push(temp);
             });
-    
+            
             setTopicData(dataArray.sort((a, b) => a.name.localeCompare(b.name)));
-        })
-        .catch((err) => {
-            window.location.reload();
-        });
-    }, [subject, topic, subTopic]);
 
-    React.useEffect(() => {
-        let id = "";
-        topicData.forEach((value, index) => {
-            if (topic === value.name) {
-                id = value.id;
+            let id;
+            for (let index = 0; index < dataArray.length; index++) {
+                if (topic === dataArray[index].name) {
+                    id = dataArray[index].id;
+                }
             }
-        });
-        getSubtopics(subjectID || " ", id || " ")
-        .then((docSnaps) => {
-            const dataArray = [];
-            docSnaps.forEach((docSnap) => {
-                const temp = {
-                    name: docSnap.data().name,
-                    id: docSnap.id
-                };
-                dataArray.push(temp);
+
+            getSubtopics(subjectId || " ", id || " ")
+            .then((docSnaps) => {
+                const dataArraySubTopics = [];
+                docSnaps.forEach((docSnap) => {
+                    const temp = {
+                        name: docSnap.data().name,
+                        id: docSnap.id
+                    };
+                    dataArraySubTopics.push(temp);
+
+                });
+
+                setSubtopicData(dataArraySubTopics.sort((a, b) => a.name.localeCompare(b.name)));
             });
-    
-            setSubtopicData(dataArray.sort((a, b) => a.name.localeCompare(b.name)));
         })
         .catch((err) => {
             window.location.reload();
@@ -370,6 +428,7 @@ function TinkeringActivityForm() {
                                 <option value="" disabled={true}>
                                     SELECT SUB TOPIC
                                 </option>
+                                {console.log(subTopicData)}
                                 {subTopicData.map((option, index) => (
                                     <option key={index} value={option.name}>
                                         {option.name}
@@ -507,8 +566,24 @@ function TinkeringActivityForm() {
                     <div className="multiForm">
                         {
                             createArray(resourcesCount).map((_, index) => {
+                                if (resources[index] === undefined) {
+                                    resources[index] = "";
+                                }
                                 return <div key={index}>
-                                    <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" value={resources[index]} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    {typeof resources[index] === "undefined"
+                                    ? <textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" value={resources[index]} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>
+                                    : (typeof resources[index] === "string" && resources[index].startsWith("https://firebasestorage.googleapis.com/v0/b/hamaralabs-dev.appspot.com/o/") ? 
+                                    <div 
+                                    type="text"
+                                    className="form-inp" 
+                                    style={{marginTop: "1rem", lineHeight: "1.5", padding: "10px", overflowWrap: "break-word"}}
+                                    ><a href={resources[index]} target="_blank" rel="noreferrer">{getFileNameFromUrl(resources[index], taNamePermanent)}</a>
+                                    </div> :<textarea name={"resource"+index} id={"resource"+index} cols="18" rows="4" placeholder="Enter the Resources" className="form-inp" readOnly={typeof resources[index] === "string" ? false : true} value={typeof resources[index] === "string" ? resources[index] : resources[index].name} onChange={mfHandleChangeResources} style={{marginTop: "1rem"}}/>)
+                                    }
+                                    <label htmlFor={"uploadMou"+index} className="resetbutton">
+                                        <i className="fa-solid fa-upload"></i>
+                                    </label>
+                                    <input type="file" name={"uploadMou"+index} id={"uploadMou"+index} style={{display: "none"}} onChange={onFileSelectResources}/>
                                     <br/>
                                 </div>
                             })
