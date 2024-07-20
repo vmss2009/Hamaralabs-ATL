@@ -1,0 +1,5 @@
+{
+  "projects": {
+    "default": "$REACT_APP_PROJECT_ID"
+  }
+}

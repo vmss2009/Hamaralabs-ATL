@@ -3,10 +3,10 @@ import {createBrowserRouter} from "react-router-dom";
 import SnapshotTAEditForm from "./routes/StudentSnapshot/TAEdit";
 import SnapshotCompEditForm from "./routes/StudentSnapshot/CompetitionEdit";
 import SnapshotCourseEditForm from "./routes/StudentSnapshot/CoursesEdit";
+import Dashboard from "./routes/Chats/Dashboard";
 
 const Index = React.lazy(() => import("./routes/Index"));
 const Login = React.lazy(() => import("./routes/Login"));
-const Register = React.lazy(() => import("./routes/Register"));
 
 const StudentForm = React.lazy(() => import("./routes/StudentData/Form"));
 const StudentEditForm = React.lazy(() => import("./routes/StudentData/EditForm"));
@@ -46,6 +46,13 @@ const PartnerForm = React.lazy(() => import("./routes/PartnerData/Form"));
 const PartnerReport = React.lazy(() => import("./routes/PartnerData/Report"));
 const PartnerEditForm = React.lazy(() => import("./routes/PartnerData/EditForm"));
 
+const SessionForm = React.lazy(() => import("./routes/SessionsData/Form"));
+const SessionReport = React.lazy(() => import("./routes/SessionsData/Report"));
+const SessionEditForm = React.lazy(() => import("./routes/SessionsData/EditForm"));
+
+const SlotManagement = React.lazy(() => import("./routes/SlotManagement/SlotManagement"));
+const SlotManagementReport = React.lazy(() => import("./routes/SlotManagement/SlotManagementReport"));
+
 const Tasks = React.lazy(() => import("./routes/Tasks/Tasks"));
 const TaskEditForm = React.lazy(() => import("./routes/Tasks/EditForm"));
 
@@ -58,6 +65,9 @@ const AdminIndividualChat = React.lazy(() => import("./routes/ChatWithAdmin/Admi
 const UsersChat = React.lazy(() => import("./routes/ChatWithAdmin/Users"));
 const ChatDashboard = React.lazy(() => import("./routes/Chats/Dashboard"));
 const Chat = React.lazy(() => import("./routes/Chats/Chat"));
+
+const Notifications = React.lazy(() => import("./routes/Notifications/Notifications"));
+const Payments = React.lazy(() => import("./routes/Payments/Payments"));
 
 const Page404 = React.lazy(() => import("./routes/404"));
 const Offline = React.lazy(() => import("./routes/Offline"));
@@ -92,12 +102,8 @@ if (encodedAuth != null) {
 const Router = createBrowserRouter([
     {
         path: "/",
-        element: (localStorage.getItem("auth") !== null) ? (<StudentSnapshot />) : (<Login />),
+        element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
         errorElement: <Page404 />,
-    },
-    {
-        path: "/register",
-        element: <Register />
     },
     {
         path: "/auth",
@@ -126,9 +132,6 @@ const Router = createBrowserRouter([
             {
                 path: "snapshot",
                 element: <AccessDeterminer accessForName="studentSnapshot" accessForComponent={StudentSnapshot} />,
-                children: [
-
-                ]
             }
         ]
     },
@@ -235,14 +238,10 @@ const Router = createBrowserRouter([
                 path: "archive",
                 element: <AccessDeterminer accessForName="competitionArchived" accessForComponent={ArchivedCompetitionReport} />
             },
-            //9.1 nageswar
             {
                 path: "snapshot",
                 element: <AccessDeterminer accessForName="competitionSnapshot" accessForComponent={CompetitionSnapshot} />,
-                children: [
-
-                ]
-            }//9.1 nageswar
+            }
         ]
     },
     {
@@ -297,6 +296,36 @@ const Router = createBrowserRouter([
         ]
     },
     {
+        path: "/session-data",
+        children: [
+            {
+                path: "add",
+                element: <AccessDeterminer accessForName="sessionForm" accessForComponent={SessionForm} />
+            },
+            {
+                path: "view",
+                element: <AccessDeterminer accessForName="sessionReport" accessForComponent={SessionReport} />
+            },
+            {
+                path: "edit/:sessionId",
+                element: <AccessDeterminer accessForName="sessionForm" accessForComponent={SessionEditForm} />
+            }
+        ]
+    },
+    {
+        path: "/slot-management",
+        children: [
+            {
+                path: "add-update",
+                element: <AccessDeterminer accessForName="slotManagement" accessForComponent={SlotManagement} />
+            },
+            {
+                path: "manage",
+                element: <AccessDeterminer accessForName="slotManagement" accessForComponent={SlotManagementReport} />
+            }
+        ]
+    },
+    {
         path: "/fallback",
         element: <FallBack />
     },
@@ -310,19 +339,27 @@ const Router = createBrowserRouter([
     },
     {
         path: "/chats",
-        element: (localStorage.getItem("auth") !== null) ? (<ChatDashboard />) : (<Login />),
+        element: <AccessDeterminer accessForName="chats" accessForComponent={ChatDashboard} />,
     },
     {
         path: "/chats/:groupId",
-        element: (localStorage.getItem("auth") !== null) ? (<Chat />) : (<Login />)
+        element: <AccessDeterminer accessForName="chats" accessForComponent={Chat} />,
     },
     {
         path: "/chat-with-admin",
-        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <AdminChat /> : <UsersChat />) : (<Login />),
+        element: <AccessDeterminer accessForName="chatWithAdmin" accessForComponent={AdminChat} />,
     },
     {
         path: "/chat-with-admin/:userId",
-        element: (localStorage.getItem("auth") !== null) ? ((role === "admin") ? <AdminIndividualChat /> : <UsersChat />) : (<Login />),
+        element: <AccessDeterminer accessForName="chatWithAdmin" accessForComponent={AdminIndividualChat} />,
+    },
+    {
+        path: "/notifications",
+        element: <AccessDeterminer accessForName="notifications" accessForComponent={Notifications} />,
+    },
+    {
+        path: "/payments",
+        element: <AccessDeterminer accessForName="payments" accessForComponent={Payments} />,
     },
     {
         path: "/offline",

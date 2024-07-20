@@ -1,0 +1,178 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+  pull_request:
+    types:
+      [closed]
+
+jobs:
+  feature-deploy:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/feature/')
+    environment: development
+    env:
+      REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
+      REACT_APP_AUTH_DOMAIN: ${{vars.REACT_APP_AUTH_DOMAIN}}
+      REACT_APP_PROJECT_ID: ${{vars.PROJECT_NAME}}
+      REACT_APP_STORAGE_BUCKET: ${{vars.REACT_APP_STORAGE_BUCKET}}
+      REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
+      REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
+      REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+      
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Substitute Environment Variables
+        run: |
+          envsubst < .github/workflows/.env > .env
+          envsubst < .github/workflows/.firebaserc > .firebaserc
+
+      - name: Install Dependencies
+        run: npm i -f
+
+      - name: Install firebase-tools globally
+        run: npm install -g firebase-tools
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase
+        run: |
+          firebase use --token ${{secrets.FIREBASE_TOKEN}}
+          firebase hosting:channel:deploy ${{ github.run_id }} -e 12h --token ${{secrets.FIREBASE_TOKEN}}
+
+  development-deploy:
+    if: github.base_ref == 'development' && github.event.pull_request.merged == true
+    environment: development
+    env:
+      REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
+      REACT_APP_AUTH_DOMAIN: ${{vars.REACT_APP_AUTH_DOMAIN}}
+      REACT_APP_PROJECT_ID: ${{vars.PROJECT_NAME}}
+      REACT_APP_STORAGE_BUCKET: ${{vars.REACT_APP_STORAGE_BUCKET}}
+      REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
+      REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
+      REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      
+      - name: Substitute Environment Variables
+        run: |
+          envsubst < .github/workflows/.env > .env
+          envsubst < .github/workflows/.firebaserc > .firebaserc
+
+      - name: Install Dependencies
+        run: npm i -f
+
+      - name: Install firebase-tools globally
+        run: npm install -g firebase-tools
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase
+        run: |
+          firebase use --token ${{secrets.FIREBASE_TOKEN}}
+          firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
+
+  staging-deploy:
+    if: github.base_ref == 'staging' && github.event.pull_request.merged == true
+    environment: staging
+    env:
+      REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
+      REACT_APP_AUTH_DOMAIN: ${{vars.REACT_APP_AUTH_DOMAIN}}
+      REACT_APP_PROJECT_ID: ${{vars.PROJECT_NAME}}
+      REACT_APP_STORAGE_BUCKET: ${{vars.REACT_APP_STORAGE_BUCKET}}
+      REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
+      REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
+      REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Substitute Environment Variables
+        run: |
+          envsubst < .github/workflows/.env > .env
+          envsubst < .github/workflows/.firebaserc > .firebaserc
+
+      - name: Install Dependencies
+        run: npm i -f
+
+      - name: Install firebase-tools globally
+        run: npm install -g firebase-tools
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase
+        run: |
+          firebase use --token ${{secrets.FIREBASE_TOKEN}}
+          firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}
+
+  production-deploy:
+    if: github.base_ref == 'main' && github.event.pull_request.merged == true
+    environment: production
+    env:
+      REACT_APP_API_KEY: ${{vars.REACT_APP_API_KEY}}
+      REACT_APP_AUTH_DOMAIN: ${{vars.REACT_APP_AUTH_DOMAIN}}
+      REACT_APP_PROJECT_ID: ${{vars.PROJECT_NAME}}
+      REACT_APP_STORAGE_BUCKET: ${{vars.REACT_APP_STORAGE_BUCKET}}
+      REACT_APP_MESSAGE_SENDER_ID: ${{vars.REACT_APP_MESSAGE_SENDER_ID}}
+      REACT_APP_APP_ID: ${{vars.REACT_APP_APP_ID}}
+      REACT_APP_MEASUREMENT_ID: ${{vars.REACT_APP_MEASUREMENT_ID}}
+      CI: ""
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Substitute Environment Variables
+        run: |
+          envsubst < .github/workflows/.env > .env
+          envsubst < .github/workflows/.firebaserc > .firebaserc
+
+      - name: Install Dependencies
+        run: npm i -f
+
+      - name: Install firebase-tools globally
+        run: npm install -g firebase-tools
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase
+        run: |
+          firebase use --token ${{secrets.FIREBASE_TOKEN}}
+          firebase deploy --only hosting --token ${{secrets.FIREBASE_TOKEN}}

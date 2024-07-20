@@ -34,7 +34,7 @@ function Users() {
                 snapshot.data().messages.forEach(message => {
                     dataArray.push(message);
                     setData(dataArray);
-                    const docRef = doc(db, "atlUsers", "DyOsm5wRYxQUOq5xSNp9wtZQsck1");
+                    const docRef = doc(db, "atlUsers", "H3tJ9gLVCWX20MGDNmzpRTcXVtu1");
                     console.log(docRef.path === message.senderRef.path);
                 });
             }
