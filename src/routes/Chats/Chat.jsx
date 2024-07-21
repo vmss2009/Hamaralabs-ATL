@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   query,
@@ -6,7 +6,8 @@ import {
   onSnapshot,
   setDoc,
   collection,
-  getDoc
+  getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Bars } from "react-loader-spinner";
@@ -18,6 +19,10 @@ import MessageComp from "../ChatWithAdmin/MessageComp";
 import Popup from "../../components/Popup";
 import Sidebar from "../../components/Sidebar";
 import { orderBy } from "lodash";
+import {
+  notificationsToAdmins,
+  notificationsToUsers,
+} from "../../firebase/cloudmessaging";
 
 function Chat() {
   const { groupId } = useParams();
@@ -30,6 +35,8 @@ function Chat() {
   const [users, setUsers] = React.useState([]);
   const [groupName, setGroupName] = React.useState("");
   const [allowedUsers, setAllowedUsers] = React.useState([]);
+  const [groupMembers, setGroupMembers] = React.useState([]);
+  const [showGroupMembers, setShowGroupMembers] = React.useState(false);
   const [fileUpload, setFilesUpload] = React.useState(null);
   const [loadingTrigger, setLoadingTrigger] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
@@ -46,6 +53,7 @@ function Chat() {
   }
 
   let uid;
+  let role;
 
   if (localStorage.auth != null) {
     let decodedAuth = atob(localStorage.auth);
@@ -53,23 +61,22 @@ function Chat() {
     let split = decodedAuth.split("-");
 
     uid = split[0];
+    role = split[2];
   }
 
-  async function handleSend() {
+  const groupRef = doc(db, "chats", groupId);
+
+  const handleSend = async () => {
     if (fileUpload !== null) {
       setLoadingTrigger(true);
       const fileToBeUploaded = fileUpload["0"];
-      const uploadingFileName =
-        fileToBeUploaded.name.split(".")[0] +
-        fileToBeUploaded.name.split(".")[1];
-      console.log(fileToBeUploaded.name.split(".")[0]);
-      console.log(Date.now());
-      console.log(fileToBeUploaded.name.split(".")[1]);
+      const uploadingFileName = fileToBeUploaded.name;
       const contentType = fileUpload["0"].type;
       const fileRef = ref(storage, `groups/${groupId}/${uploadingFileName}`);
-      await uploadBytesResumable(fileRef, fileUpload["0"] + Date.now());
-      console.log(fileUpload["0"]);
-      await getDownloadURL(fileRef).then(async (url) => {
+      await uploadBytesResumable(fileRef, fileToBeUploaded);
+      const url = await getDownloadURL(fileRef);
+      console.log(url);
+      try {
         const dataArray = [...data];
         const timeStamp = Date.now();
         // Adding date and time to the database along with other content
@@ -81,23 +88,36 @@ function Chat() {
           date: formatDate(timeStamp),
           time: formatTime(timeStamp),
         });
-        console.log(dataArray.name);
+        console.log(dataArray.fileURL);
         setMessage("");
         await setDoc(
-          doc(db, "chats", groupId),
+          groupRef,
           {
             messages: dataArray,
           },
           { merge: true }
         );
         setData(dataArray);
-      });
+      } catch (err) {
+        console.log(err);
+      }
+      const groupData = await getDoc(groupRef);
+      const senderRef = doc(db, "atlUsers", uid);
+      const senderData = await getDoc(senderRef);
+      await notificationsToAdmins(
+        "New Message",
+        `${groupData.data().groupName} - ${senderData.data().name} - ${message}`
+      );
       document.querySelector("#file").value = "";
       setFilesUpload(null);
       setLoadingTrigger(false);
     } else if (message !== "") {
       const dataArray = [...data];
       const timeStamp = Date.now();
+      const groupData = await getDoc(groupRef);
+      const senderRef = doc(db, "atlUsers", uid);
+      const senderData = await getDoc(senderRef);
+
       // Adding date and time to the database along with other content
       dataArray.push({
         senderRef: doc(db, "atlUsers", uid),
@@ -107,18 +127,34 @@ function Chat() {
       });
       setMessage("");
       await setDoc(
-        doc(db, "chats", groupId),
+        groupRef,
         {
           messages: dataArray,
         },
         { merge: true }
       );
-      console.log(dataArray);
+      const mentorsRef = [];
+      for (const memberRef of groupData.data().users) {
+        const memberData = await getDoc(memberRef);
+        if (memberData.data().role === "mentor" && memberData.id !== uid) {
+          mentorsRef.push(memberRef);
+        }
+      }
+      await notificationsToUsers(
+        mentorsRef,
+        "New Message",
+        `${groupData.data().groupName} - ${senderData.data().name} - ${message}`
+      );
+      await notificationsToAdmins(
+        "New Message",
+        `${groupData.data().groupName} - ${senderData.data().name} - ${message}`
+      );
+
       setData(dataArray);
     } else {
       alert("Please type a message");
     }
-  }
+  };
   // fomatting the date to dd-mm-yyyy
   const formatDate = (timeStamp) => {
     const date = new Date(timeStamp);
@@ -210,6 +246,29 @@ function Chat() {
     setFilesUpload(event.target.files);
   }
 
+  function getTimestamp(date, time) {
+    // Split the date to get day, month, and year
+    const [day, month, year] = date.split("-").map(num => parseInt(num, 10));
+  
+    // Split the time to get hours and minutes, and adjust for AM/PM
+    let [hours, minutesPart] = time.split(":");
+    let minutes = parseInt(minutesPart, 10);
+    let ampm = minutesPart.slice(-2);
+    hours = parseInt(hours, 10);
+  
+    // Convert 12-hour clock to 24-hour clock based on AM/PM
+    if (ampm === "PM" && hours < 12) {
+      hours += 12;
+    } else if (ampm === "AM" && hours === 12) {
+      hours = 0;
+    }
+  
+    // Create a Date object
+    const dateTime = new Date(year, month - 1, day, hours, minutes);
+    
+    return dateTime;
+  }
+
   async function onRecordingComplete(recordedBlob) {
     setLoadingTrigger(true);
     const uploadingFileName = Date.now() + ".mp3";
@@ -252,8 +311,6 @@ function Chat() {
 
   window.data = data;
   // Getting the unique dates of the chats to a set
-  const sortDates = [...new Set(data.map((message) => message.date))];
-
   function handleRecordReq() {
     if (isRecording) {
       setIsRecording(false);
@@ -262,15 +319,35 @@ function Chat() {
     }
   }
 
+  showMembers();
+
+  async function showMembers() {
+    const docRef = doc(db, "chats", groupId); // Assuming groupId is accessible in this component
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const usersRefs = data.users;
+      const members = await Promise.all(
+        usersRefs.map(async (userRef) => {
+          const userDoc = await getDoc(userRef);
+          return [userDoc.data().name, userDoc.data().role]; // Assuming each user document has a 'name' field
+        })
+      );
+      setGroupMembers(members);
+    } else {
+      console.log("Group document does not exist");
+    }
+  }
+
   document.title = "Group Chat | Digital ATL";
 
   // Using react useEffect hook when the data is effected
-  React.useEffect(() => {
+  useEffect(() => {
     // Scrolling to down when a new message is entered or the page is rendered newly
     chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
   }, [data]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const q = query(doc(db, "chats", groupId));
 
     onSnapshot(q, (snapshot) => {
@@ -290,7 +367,10 @@ function Chat() {
         window.location.href = "/chats";
       } else {
         setGroupName(snapshot.data().groupName);
-        if ((snapshot.data().messages === null) || (snapshot.data().messages === undefined)) {
+        if (
+          snapshot.data().messages === null ||
+          snapshot.data().messages === undefined
+        ) {
           setMessage("");
         } else {
           snapshot.data().messages.forEach((message) => {
@@ -311,9 +391,89 @@ function Chat() {
         usersData.push(tempData);
       });
       setUsers(usersData);
-      console.log(usersData);
     });
   }, [groupId, uid]);
+
+  const deleteMessage = async (index) => {
+    try {
+      setLoadingTrigger(true);
+      const chatDocRef = doc(collection(db, "chats"), groupId);
+      const chatDocSnapshot = await getDoc(chatDocRef);
+      const msgArray = chatDocSnapshot.data().messages;
+      const updatedMsgArray = [
+        ...msgArray.slice(0, index),
+        ...msgArray.slice(index + 1),
+      ];
+      await updateDoc(chatDocRef, { messages: updatedMsgArray });
+      setData(updatedMsgArray);
+      await setLoadingTrigger(false);
+    } catch (error) {
+      alert("Oops! Something went wrong! Please try again");
+    }
+  };
+
+  // Function to display messages grouped by dates
+  const messageList = () => {
+    let refDate = ""; // Current date reference
+    return data.map((message, messageIndex) => {
+      const timeStamp = getTimestamp(message.date, message.time);
+      const isDelete = (Date.now() - timeStamp.getTime())/1000 < 120;
+      return <div>
+        <div style={{ textAlign: "center" }}>
+          {refDate !== message.date && (
+            <h2
+              style={{
+                fontSize: "15px",
+                textAlign: "center",
+                margin: "5px auto",
+                backgroundColor: "#d7d2cb",
+                width: "100px",
+                padding: "5px",
+                borderRadius: "5px",
+              }}
+            >
+              {message.date}
+            </h2>
+          )}
+          <span style={{ display: "none" }}>
+            {refDate !== message.date && (refDate = message.date)}
+          </span>
+        </div>
+        <div>
+          <MessageComp
+            id={messageIndex}
+            key={messageIndex}
+            fileName={message.fileName}
+            fileURL={message.fileURL}
+            senderUID={message.senderRef.path.replace("atlUsers/", "")}
+            content={message.content}
+            date={message.date}
+            time={message.time}
+          >
+            { role === "admin" || (uid === message.senderRef.path.replace("atlUsers/", "") && isDelete) ?
+            <span>
+              <button // Button that deleted the message
+                type="button"
+                style={{
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "5px",
+                  background: "rgb(218, 218, 218)",
+                  borderRadius: "5px",
+                  backdropFilter: "blur(3px);",
+                }}
+                id="deleteButton"
+                onClick={() => {if(window.confirm("Do you want to delete this message ?"))deleteMessage(messageIndex)}}
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </span>
+            : ""}
+          </MessageComp>
+        </div>
+      </div>
+    });
+  };
 
   return (
     <div className="container">
@@ -326,14 +486,23 @@ function Chat() {
         closeAllowed={true}
       >
         <h1 style={{ display: "inline-block" }}>User: </h1>
-        <select name="selectUserRole" id="selectUserRole" onChange={(event) => {setSelectRole(event.target.value)}}>
-          <option value="" selected={true} disabled={true}>SELECT</option>
+        <select
+          name="selectUserRole"
+          id="selectUserRole"
+          onChange={(event) => {
+            setSelectRole(event.target.value);
+          }}
+        >
+          <option value="" selected={true} disabled={true}>
+            SELECT
+          </option>
           <option value="mentor">Mentor</option>
           <option value="atlIncharge">Incharge</option>
           <option value="student">Student</option>
         </select>
-        {
-          (selectRole === "atlIncharge" || selectRole === "student" || selectRole === "mentor") ?
+        {selectRole === "atlIncharge" ||
+        selectRole === "student" ||
+        selectRole === "mentor" ? (
           <select name="user" id="user">
             {users.map((user, index) => {
               if (user.role === "atlIncharge" && selectRole === "atlIncharge") {
@@ -358,8 +527,10 @@ function Chat() {
                 return null;
               }
             })}
-          </select> : ""
-        }
+          </select>
+        ) : (
+          ""
+        )}
         <br />
         <button className="submitbutton" onClick={handleAddToGroup}>
           Add to chat group
@@ -387,6 +558,37 @@ function Chat() {
         <hr />
         <button
           className="resetbutton"
+          style={{ position: "fixed", top: "0", right: "10rem" }}
+          onClick={() => setShowGroupMembers((prevState) => !prevState)}
+        >
+          <span>
+            <i class="fa-solid fa-users-line"></i>
+            <span style={{ fontSize: "15px", marginLeft: "5px" }}>
+              Group Members {showGroupMembers}
+            </span>
+          </span>
+          {showGroupMembers ? (
+            <i class="fa-solid fa-caret-up"></i>
+          ) : (
+            <i class="fa-solid fa-caret-down"></i>
+          )}
+          {showGroupMembers && (
+            <ul
+              style={{
+                listStyle: "none",
+                textAlign: "left",
+              }}
+            >
+              {groupMembers.map((member, index) => (
+                <li key={index} style={{ marginTop: "5px" }}>
+                  {member[0]} - {member[1]}
+                </li>
+              ))}
+            </ul>
+          )}
+        </button>
+        <button
+          className="resetbutton"
           style={{ position: "fixed", top: "0", right: "1.5rem" }}
           onClick={openPopUp}
         >
@@ -399,44 +601,9 @@ function Chat() {
           height: "73vh",
           overflow: "auto",
         }}
-      ref={chatBoxRef}
+        ref={chatBoxRef}
       >
-        <div className="chat-box">
-          {/* Getting the chats grouped by dates */}
-          {sortDates.map((date, dateIndex) => (
-            <div key={dateIndex}>
-              <h2
-                style={{
-                  fontSize: "15px",
-                  textAlign: "center",
-                  margin: "5px auto",
-                  backgroundColor: "#d7d2cb",
-                  width: "100px",
-                  padding: "5px",
-                  borderRadius: "5px",
-                }}
-              >
-                {date}
-                {/* Adding date to heading field */}
-              </h2>
-              {/* Added the date and time to message component and displaying them grouped by dates using "filter"*/}
-              {data
-                .filter((message) => message.date === date)
-                .map((message, messageIndex) => (
-                  <MessageComp
-                    id={messageIndex}
-                    key={messageIndex}
-                    fileName={message.fileName}
-                    fileURL={message.fileURL}
-                    senderUID={message.senderRef.path.replace("atlUsers/", "")}
-                    content={message.content}
-                    date={message.date}
-                    time={message.time}
-                  />
-                ))}
-            </div>
-          ))}
-        </div>
+        <div className="chat-box">{messageList()}</div>
       </div>
       <div
         className="messageInputsContainer"
@@ -456,7 +623,7 @@ function Chat() {
           name="file"
           id="file"
           className="resetbutton"
-          accept=".pdf, .mp3, .mp4, .jpg, .jpeg"
+          accept="*/*"
           onChange={handleSelectFiles}
           onMouseEnter={handleSend}
           style={{

@@ -7,18 +7,17 @@ function ReportBox(props) {
     const [data, setData] = React.useState({});
     const [displayValue, setDisplayValue] = React.useState("none");
     const [teamMems, setTeamMems] = React.useState([]);
-    const [open, setOpen] = React.useState(false);
     const [assignToOpen, setAssignToOpen] = React.useState(false);
     const [assignedTo, setAssignedTo] = React.useState("");
     const [commentWords, setCommentWords] = React.useState([]);
     const [descriptionWords, setDescriptionWords] = React.useState([]);
 
     let email = atob(localStorage.auth).split("-")[1];
-    let role = atob(localStorage.auth).split("-")[2];
+    let role = atob(localStorage.auth).split("-")[0];
 
     const [selectedRole, setSelectedRole] = React.useState("ATL-Incharge"); // Default selection
 
-    React.useEffect(() =>{
+    React.useEffect(() => {
         const q = query(doc(db, "tasksData", props.task.ref.path.replace("tasksData/", "")));
         onSnapshot(q, (docSnap) => {
             const tempData = docSnap.data();
@@ -34,7 +33,7 @@ function ReportBox(props) {
                 });
             }
         });
-    }, [])
+    }, [props.task])
 
     function handleMouseOver(event) {
         setDisplayValue("block");
