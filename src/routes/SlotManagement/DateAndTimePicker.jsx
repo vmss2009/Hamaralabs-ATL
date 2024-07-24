@@ -14,7 +14,7 @@ const generateInitialState = (rows, cols) => {
 
 const DateAndTimePicker = ({ days, setSlotData }) => {
   const rows = days;
-  const cols = 10;
+  const cols = 13;
   const [checked, setChecked] = useState(generateInitialState(rows, cols));
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const DateAndTimePicker = ({ days, setSlotData }) => {
   };
 
   const handleTimeChange = (index) => {
-    const timeSlots = ['8 - 9', '9 - 10', '10 - 11', '11 - 12', '12 - 13', '13 - 14', '14 - 15', '15 - 16', '16 - 17', '17 - 18'];
+    const timeSlots = ['8 - 9', '9 - 10', '10 - 11', '11 - 12', '12 - 13', '13 - 14', '14 - 15', '15 - 16', '16 - 17', '17 - 18', '18 - 19', '19 - 20', '20 - 21'];
     return timeSlots[index - 1];
   };
 
@@ -67,7 +67,7 @@ const DateAndTimePicker = ({ days, setSlotData }) => {
       <Grid container spacing={1} sx={{ mb: 1 }}>
         <Grid item xs={1}></Grid>
         {Array.from({ length: cols }, (_, i) => i + 1).map(col => (
-          <Grid item xs={1} key={`col-header-${col}`} sx={{ textAlign: 'center' }}>
+          <Grid item xs={0.8} key={`col-header-${col}`} sx={{ textAlign: 'center' }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -100,7 +100,7 @@ const DateAndTimePicker = ({ days, setSlotData }) => {
             />
           </Grid>
           {Array.from({ length: cols }, (_, i) => i + 1).map(col => (
-            <Grid item xs={1} key={`cell-${row}-${col}`} sx={{ textAlign: 'center' }}>
+            <Grid item xs={0.8} key={`cell-${row}-${col}`} sx={{ textAlign: 'center' }}>
               <Checkbox
                 checked={checked[row] ? checked[row][col] : false}
                 onChange={() => handleChange(row, col)}
