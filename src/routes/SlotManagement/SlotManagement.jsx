@@ -42,7 +42,7 @@ function SlotManagement () {
                     tempData.push(temp);
                 }
             });
-            setSchool(tempData);
+            setSchool(tempData.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
         });
     }, []);
 
