@@ -1,11 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {Bars} from "react-loader-spinner";
 import axios from "axios";
 import { getDoc } from "firebase/firestore";
+import Receipt from "./Receipt";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+const Popup = React.lazy(() => import("../../components/Popup"));
 
 function PaymentReportBox(props) {
     const [displayValue, setDisplayValue] = useState("none");
+    const [openPopup, setOpenPopup] = useState(false);
     const [loading, setLoading] = useState(false);
+    const receiptRef = useRef();
     const [discount, setDiscount] = useState({
         code: "NONE",
         appliesTo: [],
@@ -13,7 +20,18 @@ function PaymentReportBox(props) {
         discount: 0
     });
     const [tinkeringActivityData, setTinkeringActivityData] = useState({});
+    const [receiptData, setReceiptData] = useState({});
+    const [popUpLoading, setPopupLoading] = useState(false);
     const [tinkeringActivityAmount, setTinkeringActivityAmount] = useState(0);
+
+    const labelName = {"tinkeringActivity": "Tinkering Activity", "onBoarding": "Onboarding Hamaralabs"};
+    let decodedAuth = atob(localStorage.auth);
+
+    let split = decodedAuth.split("-");
+
+    const uid = split[0];
+    const email = split[1];
+    const role = split[2];
 
     function handleMouseOver(event) {
         setDisplayValue("block");
@@ -40,6 +58,31 @@ function PaymentReportBox(props) {
         }
     }, [props]);
 
+    useEffect(() => {
+        if (popUpLoading) {
+            (async () => {
+                const response = await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/paymentIntegration/getStatus", {
+                    merchantTransactionId: props.data.merchantTransactionId,
+                    merchantId: "{merchantId}"
+                });
+                const tempReceiptData = response.data.data.data;
+                const receiptDataTemp = {
+                    date: props.data.timestamp,
+                    merchantTransactionId: tempReceiptData?.merchantTransactionId,
+                    transactionId: tempReceiptData?.transactionId,
+                    paidBy: email,
+                    amount: tempReceiptData?.amount,
+                    paymentMethod: tempReceiptData?.paymentInstrument.type,
+                    notes: 'Payment for services rendered',
+                    items: [
+                      { description: labelName[props.data.type], quantity: 1, price: tempReceiptData?.amount, total: tempReceiptData?.amount },
+                    ]
+                };
+                setReceiptData(receiptDataTemp);
+                setPopupLoading(false);
+            })();
+        }
+    }, [popUpLoading]);
 
     async function handleReferalCodes() {
         const promptRepsonse = prompt("Enter referal code: ");
@@ -60,6 +103,31 @@ function PaymentReportBox(props) {
         }
     }
 
+    const downloadPDF = () => {
+        html2canvas(receiptRef.current).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', [200, 200]); // Increased height: 356mm (A4 height + extra 20mm), A4 width: 216mm
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgWidth = pdfWidth;
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            
+            const heightExceedsPage = imgHeight > pdfHeight;
+            
+            // If the image height exceeds the page height, adjust the page height to the image height
+            if (heightExceedsPage) {
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.internal.pageSize.height = imgHeight;
+            } else {
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, pdfHeight);
+            }
+
+            pdf.save('receipt.pdf');
+        });
+    };
+
     async function handleTinkeringActivityCheckout(){
         props.setLoading(true);
         console.log(discount);
@@ -68,16 +136,16 @@ function PaymentReportBox(props) {
         const merchantUserId = `MUI797${currentTimestamp}`;
         if(discount.discount !== 0 && discount.appliesTo.includes("tinkeringActivity")) {
             let discountedValue;
-            if(discount.discountType === "price")
+            if(discount.discountType === "price") {
                 discountedValue = tinkeringActivityAmount - discount.discount
-            else
+            } else
                 discountedValue = tinkeringActivityAmount - (tinkeringActivityAmount * discount.discount/100)
-                const redirectUrl = `https://app.hamaralabs.com/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
-                window.location.href = `https://hamaralabs.com/payment/checkout?amount=${discountedValue}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${redirectUrl}`;
+            const redirectUrl = `http://localhost:3000/payments?amount=${discountedValue}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
+            window.location.href = `https://hamaralabs.com/payment/checkout?amount=${discountedValue}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${redirectUrl}`;
         } else {
-            console.log(tinkeringActivityAmount);
-            const redirectUrl = `https://app.hamaralabs.com/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
-            window.location.href = `https://hamaralabs.com/payment/checkout?amount=${tinkeringActivityAmount}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${redirectUrl}`;
+            const redirectUrl = `http://localhost:3000/payments?amount=${tinkeringActivityAmount}&docId=${props.data.taID}&merchantTransactionId=${merchantTransactionId}&merchantId=` + "${merchantId}";
+            console.log(`https://hamaralabs.com/payment/checkout?amount=${tinkeringActivityAmount}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${encodeURIComponent(redirectUrl)}`);
+            window.location.href = `https://hamaralabs.com/payment/checkout?amount=${tinkeringActivityAmount}&merchantTransactionId=${merchantTransactionId}&merchantUserId=${merchantUserId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
         }
     }
 
@@ -92,11 +160,11 @@ function PaymentReportBox(props) {
                     ariaLabel="loading"
                     wrapperStyle
                     wrapperClass
-                />}
+                    />}
             </div>
         );
     }
-
+    
     if (props.showWhat === "currentPayments") {
         if (props.data.type === "tinkeringActivity") {
             return (
@@ -151,7 +219,30 @@ function PaymentReportBox(props) {
             return (
                 <div className="box" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} style={{backgroundColor: props.data.status === "success" ? "#ccffcc" : "#ffcccc"}}>
                     <div className="name" style={{fontSize: "1.5rem"}}>{props.data.taName}</div>
-                    <div className="boxContainer"><span style={{fontWeight: "600"}}>TA ID:</span> {tinkeringActivityData.taID}</div>
+                    {openPopup ? (
+                        <Popup trigger={openPopup} setPopupEnabled={setOpenPopup} closeAllowed={true}>
+                            {popUpLoading ? (
+                            <div style={{height: "85%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                <Bars
+                                    height="80"
+                                    width="80"
+                                    radius="9"
+                                    color="black"
+                                    ariaLabel="loading"
+                                    wrapperStyle
+                                    wrapperClass
+                                    />
+                            </div>
+                            ) : 
+                            <>
+                                <Receipt receiptData={Object.keys(receiptData).length > 0 ? receiptData : {}} ref={receiptRef} />
+                                <button className="submitbutton deleteBtn" onClick={downloadPDF}>Download PDF</button>
+                            </>
+                            }
+                        </Popup>
+                        )  : ""
+                    }
+                    <div className="boxContainer"><span style={{fontWeight: "600"}}>TA ID:</span> {tinkeringActivityData?.taID}</div>
                     <br/>
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction ID:</span> {props.data.merchantTransactionId}</div>
                     <br/>
@@ -160,12 +251,37 @@ function PaymentReportBox(props) {
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Amount:</span> {props.data.amount}</div>
                     <br/>
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction time:</span> {props.data.timestamp}</div>
+                    <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
+                        {props.data.status === "success" ? <button className="submitbutton deleteBtn" onClick={() => {setOpenPopup(true); setPopupLoading(true)}}>Receipt</button> : ""}
+                    </div>
                 </div>
             );
         } else if (props.data.type === "onBoarding") {
             return (
                 <div className="box" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} style={{backgroundColor: props.data.status === "success" ? "#ccffcc" : "#ffcccc"}}>
                     <div className="name" style={{fontSize: "1.5rem"}}>Onboard Hamaralabs</div>
+                    {openPopup ? 
+                        <Popup trigger={openPopup} setPopupEnabled={setOpenPopup} closeAllowed={true}>
+                            {popUpLoading ? (
+                            <div style={{height: "85%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                <Bars
+                                    height="80"
+                                    width="80"
+                                    radius="9"
+                                    color="black"
+                                    ariaLabel="loading"
+                                    wrapperStyle
+                                    wrapperClass
+                                    />
+                            </div>
+                            ) : 
+                            <>
+                                <Receipt receiptData={Object.keys(receiptData).length > 0 ? receiptData : {}} ref={receiptRef} />
+                                <button className="submitbutton deleteBtn" onClick={downloadPDF}>Download PDF</button>
+                            </>
+                            }
+                        </Popup> : ""
+                    }
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction ID:</span> {props.data.merchantTransactionId}</div>
                     <br/>
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction status:</span> {props.data.status}</div>
@@ -173,11 +289,15 @@ function PaymentReportBox(props) {
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Amount:</span> {props.data.amount}</div>
                     <br/>
                     <div className="boxContainer"><span style={{fontWeight: "600"}}>Transaction time:</span> {props.data.timestamp}</div>
+                    <div className="buttonsContainer" id={"btnContainer"+props.id} style={{display: displayValue}}>
+                        {props.data.status === "success" ? <button className="submitbutton deleteBtn" onClick={() => {setOpenPopup(true); setPopupLoading(true)}}>Receipt</button> : ""}
+                    </div>
                 </div>
             );
         }
     }
 
 }
+
 
 export default PaymentReportBox;
