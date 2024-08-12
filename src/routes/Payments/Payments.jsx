@@ -52,7 +52,8 @@ function Payments() {
             const taQuerySnapshot = await getDocs(qTa);
 
             taQuerySnapshot.forEach(taSnap => {
-                if(taSnap.data().patmentRequired) {
+                if(taSnap.data().paymentRequired === true) {
+                    console.log(taSnap.data());
                     const temp = taSnap.data();
                     temp.docId = taSnap.id;
                     temp.type = "tinkeringActivity";
@@ -84,6 +85,8 @@ function Payments() {
                         merchantTransactionId: merchantTransactionId,
                         merchantId: merchantId
                     });
+
+                    console.log(response.data);
 
                     if (response.data.data.code === "PAYMENT_SUCCESS") {
                         setStatus("success");
@@ -129,7 +132,7 @@ function Payments() {
                         await updateDoc(taPurchased, {
                             paymentInfo: {
                                 status: "success",
-                                amount: amount,
+                                amount: parseInt(amount),
                                 merchantTransactionId: merchantTransactionId,
                             }
                         });
@@ -190,7 +193,7 @@ function Payments() {
 
         if (openPopup && showPopup === false) {
             setOpenPopup(false);
-            window.location.href = "/payments?showWhat=paymentsHistory";
+            // window.location.href = "/payments?showWhat=paymentsHistory";
         }
     }, [showPopup]);
 
