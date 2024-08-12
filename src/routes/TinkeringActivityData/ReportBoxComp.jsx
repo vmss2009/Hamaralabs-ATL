@@ -201,8 +201,20 @@ function ReportBox(props) {
         });
     }
 
+    function extractAlphabetsAndTimestamp(inputString) {
+        const alphabetsMatch = inputString.match(/[a-zA-Z]+/g);
+        const alphabets = alphabetsMatch ? alphabetsMatch.join('') : '';
+        const timestamp = Date.now();
+        const result = alphabets + timestamp;
+
+        return result;
+    }
+
     async function generateTA() {
         props.setLoading(true);
+        const inputString = props.activity.taID;
+        const result = extractAlphabetsAndTimestamp(inputString);
+        props.activity.taID = result;
         const response = await axios.post("https://us-central1-hamaralabs-prod.cloudfunctions.net/tinkeringActivityAI/generate", {"inputText": "Only give me the JSON without any extra letters !!!. Just give me the object !!!. No other extra word. Give me the next best tinkering activity of the same type with slightly increased complexity for the given TA." + JSON.stringify(props.activity)});
         const axiosResponse = response.data;
         const responseText = axiosResponse.response.response.candidates[0].content.parts[0].text;
@@ -361,7 +373,7 @@ function ReportBox(props) {
                 {
                     role === "admin" ?
                     <>
-                        {email === "mohan@hamaralabs.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
+                        {email === "mohan@hamaralabs.com" || email === "atlincharge22@gmail.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
                         <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
                         <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
                     </>: ""

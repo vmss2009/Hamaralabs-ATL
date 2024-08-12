@@ -100,6 +100,8 @@ function ReportBox(props) {
     
             return Promise.all([assignSessionPromise, updateStudentPromise]);
         });
+
+        setSelectedOptions([]);
     
         Promise.all(assignPromises)
             .then(() => {
@@ -174,7 +176,7 @@ function ReportBox(props) {
                                 <br/>
                                 <label>
                                     Payment required ? &nbsp;
-                                    <input type={"checkbox"} defaultChecked={checkBox} onChange={(e) => {setCheckBox(e.target.checked)}}/>                                </label>
+                                    <input type={"checkbox"} defaultChecked={checkBox} onChange={(e) => {setCheckBox(e.target.checked)}}/></label>
                                 </>
                             : ""
                         }
@@ -228,7 +230,7 @@ function ReportBox(props) {
                 <button className="submitbutton deleteBtn" onClick={() => setAssignToOpen(true)}>Assign To</button>
                 <button className="editBtn resetbutton" data-url={editUrl} onClick={handleEditClick}><i className="fa-solid fa-pencil"></i></button>
                 <button className="submitbutton deleteBtn" data-url={deleteUrl} onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
-            </div> 
+            </div>
         </div>
     );
 }

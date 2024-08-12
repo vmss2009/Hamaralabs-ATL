@@ -25,7 +25,7 @@ const getTimeSlots = (startHour, endHour) => {
 };
 
 const DateAndTimePicker = ({ initialData, setSlotBookings, slotNumber, month }) => {
-  const timeSlots = getTimeSlots(8, 18); // From 8:00 to 18:00
+  const timeSlots = getTimeSlots(8, 21); // From 8:00 to 18:00
   const datesInMonth = Object.keys(initialData).map((key) => `Day ${key}`);
 
   const [checked, setChecked] = useState({});
@@ -64,11 +64,11 @@ const DateAndTimePicker = ({ initialData, setSlotBookings, slotNumber, month }) 
         Select Time Slots {month !== undefined ? `(for ${month})` : ''}
       </Typography>
       <Grid container spacing={1}>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography>Date</Typography>
         </Grid>
         {timeSlots.map((slot, index) => (
-          <Grid item xs={1} key={index}>
+          <Grid item xs={0.8} key={index}>
             <Typography>{slot}</Typography>
           </Grid>
         ))}
@@ -77,11 +77,11 @@ const DateAndTimePicker = ({ initialData, setSlotBookings, slotNumber, month }) 
         const rowIndex = parseInt(dateKey, 10);
         return (
           <Grid container spacing={1} key={rowIndex} sx={{ alignItems: 'center' }}>
-            <Grid item xs={2}>
+            <Grid item xs={1}>
               <Typography>{`Day ${dateKey}`}</Typography>
             </Grid>
             {timeSlots.map((slot, colIndex) => (
-              <Grid item xs={1} key={colIndex}>
+              <Grid item xs={0.8} key={colIndex}>
                 <FormControlLabel
                   control={
                     <Checkbox
