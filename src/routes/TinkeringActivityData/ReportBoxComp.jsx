@@ -373,7 +373,7 @@ function ReportBox(props) {
                 {
                     role === "admin" ?
                     <>
-                        {email === "mohan@hamaralabs.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
+                        {email === "mohan@hamaralabs.com" || email === "atlincharge22@gmail.com" ? <button className="submitbutton deleteBtn" onClick={async () => await generateTA()}>Generate TA</button> : ""}
                         <button className="submitbutton deleteBtn" onClick={async () => await cloneTA()}>Clone</button>
                         <button className="submitbutton deleteBtn" onClick={handleDelete}><i className="fa-solid fa-trash-can"></i></button>
                     </>: ""
