@@ -42,7 +42,7 @@ function SlotManagement () {
                     tempData.push(temp);
                 }
             });
-            setSchool(tempData);
+            setSchool(tempData.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
         });
     }, []);
 
@@ -159,7 +159,7 @@ function SlotManagement () {
     ];
 
     return (
-        <div className="container" id="mobilescreen">
+        <div className="containerSlot" id="mobilescreen">
             <Sidebar />
             <link rel="stylesheet" href="/CSS/school.css" />
             <form>
