@@ -49,7 +49,7 @@ function SlotManagementReport () {
                     tempSchools.push(temp);
                 }
             });
-            setSchools(tempSchools);
+            setSchools(tempSchools.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
         });
     }, []);
 
