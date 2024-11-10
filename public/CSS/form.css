@@ -1,0 +1,216 @@
+.container .title {
+    font-size: 1.4rem;
+}
+
+label {
+    font-size: 1.2rem;
+}
+
+.form-inp {
+    margin-left: 0.3rem;
+    font-size: 1.2rem;
+    width: 15rem;
+    border: 2.5px solid rgb(197, 197, 197);
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    outline: none;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.ref-link{
+    margin-left: 0.3rem;
+    font-size: 1.2rem;
+    border: 2.5px solid rgb(197, 197, 197);
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    outline: none;
+    text-align: center;
+    width: 30rem;
+}
+
+.form-inp:focus {
+    border-color: #000;
+}
+
+select {
+    padding: 0 0.1rem;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    outline: none;
+    cursor: pointer;
+    border-radius: 0.3rem;
+}
+
+hr {
+    margin: 1rem 0;
+    border: 1px solid rgb(142, 142, 142);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.formContainer {
+    margin: 1.5rem 0.2rem;
+}
+
+.message.success {
+    border: 3px solid rgb(0, 126, 0);
+    background-color: rgb(0, 240, 0);
+    padding: 1rem;
+    font-size: 1.2rem;
+}
+
+.message.fail {
+    border: 3px solid rgb(164, 0, 0);
+    background-color: rgb(255, 44, 44);
+    font-size: 1.2rem;
+    padding: 1rem;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.submitbutton {
+    user-select: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 0.5rem 1rem;
+    background-color: #1abc9c;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    margin-top: 1rem;
+    color: #fff;
+    transition: 0.2s ease;
+}
+
+.submitbutton:hover {
+    background-color: #2eaf96;
+}
+
+.resetbutton {
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 0.5rem 1rem;
+    background-color: #f4f4f4;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    transition: 0.2s ease;
+    margin-top: 1rem;
+    user-select: none;
+}
+
+.resetbutton:hover {
+    background-color: #d3d3d3;
+}
+
+#show {
+    cursor: pointer;
+}
+
+.messageBox {
+    font-size: 1.2rem;
+    border: 3px solid #3e3e3e;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    margin: 0.5rem 0;
+    border-radius: 10px;
+    width: fit-content;
+    display: flex;
+}
+
+.sentMessageContainer {
+    display: flex;
+    width: 100%;
+    flex-direction: row-reverse;
+}
+
+.messageBox.sent {
+    background-color: #25e6c2;
+    max-width: 85%;
+}
+
+.messageBox.received {
+    background-color: #c084e0;
+    height: fit-content;
+    max-width: 85%;
+}
+
+.large-textarea {
+    padding: 0.5rem;
+    border: 3px solid rgb(222, 222, 222);
+    border-radius: 0.4rem;
+    transition: 0.3s ease;
+    margin-left: 3rem;
+    font-size: 1.2rem;
+    min-height: 10rem;
+    min-width: 25rem;
+}
+
+textarea {
+    padding: 0.5rem;
+    border: 3px solid rgb(222, 222, 222);
+    border-radius: 0.4rem;
+    transition: 0.3s ease;
+    margin-left: 3rem;
+    font-size: 1.2rem;
+    min-height: 4rem;
+    min-width: 15rem;
+}
+
+textarea:focus {
+    border-color: #000;
+}
+
+.form-inp#searchInp {
+    width: 95%;
+    font-size: 1.4rem;
+    padding: 0.4rem;
+}
+
+.resetbutton.clearsearch {
+    margin-left: 0.5rem;
+}
+
+#schoolname {
+    width: 25rem;
+}
+
+#address {
+    margin: 1rem;
+}
+
+#address input {
+    text-align: left;
+    width: 50%;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+#address input[type="number"] {
+    margin-top: 2rem;
+}
+
+input[type="email"] {
+    width: 25rem;
+}
+
+#teamMembers {
+    margin-left: 2rem;
+}
+
+div.resetbutton {
+    display: inline-block;
+}
+
+.multiform-inp{
+    display: block;
+    margin-top: 1.2rem;
+}
+
+@media (max-width: 1000px) {
+    body {
+        font-size: 25px;
+    }
+}

@@ -1,0 +1,22 @@
+.subTitle {
+    font-size: 1.4rem;
+    margin-top: 0.5rem;
+}
+
+.item {
+    font-size: 1.2rem;
+    padding: 0.8rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: #ececec;
+    transition: 0.3s;
+}
+
+.item:hover {
+    background-color: rgb(197, 255, 255);
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}

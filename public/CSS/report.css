@@ -1,0 +1,136 @@
+
+.title {
+    font-size: 1.4rem;
+    margin-top: 2rem;
+}
+
+/*.container {*/
+/*    font-size: 10px;*/
+/*    text-align: center;*/
+/*}*/
+
+/*.container .title {*/
+/*    margin-top: -1rem;*/
+/*    margin-bottom: 1rem;*/
+/*}*/
+
+.box {
+    position: relative;
+    overflow: auto;
+    border: 3px solid rgb(106, 106, 106);
+    background-color: rgb(235, 235, 235);
+    padding: 1rem;
+    border-radius: 2rem;
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.box .name {
+    margin-left: 0.1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.boxContainer {
+    display: inline-block;
+    margin-left: 0.8rem;
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+hr {
+    border: 2px solid rgb(123, 123, 123);
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
+
+.searchResult {
+    margin-bottom: 1rem;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    border: 1px solid #000;
+    border-radius: 10px;
+    z-index: 20;
+    background-color: #fff;
+    width: 80%;
+    height: 80%;
+    transition: 0.2s ease-in-out;
+}
+
+.modal.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-header {
+    padding: 0.5rem 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #000;
+}
+
+.modal-header .modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: 'Poppins';
+}
+
+.modal-header .closeBtn {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 0.5rem 0.8rem;
+    font-size: 1rem;
+}
+
+.overlay {
+    position: fixed;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    transition: 0.2s ease-in-out;
+    z-index: 15;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.buttonsContainer {
+    position: absolute;
+    right: 10px;
+    top: -10px;
+}
+
+.resetbutton, .deleteBtn {
+    margin-left: 0.2rem;
+}
+
+@media (max-width: 910px) {
+    .box {
+        max-height: unset;
+        overflow: unset;
+        overflow-x: auto;
+        min-height: unset;
+    }
+    body {
+        font-size: 25px;
+    }
+}

@@ -1,0 +1,114 @@
+.sidebar {
+    z-index: 5!important;
+    height: 100vh!important;
+    position: fixed!important;
+    top: 0!important;
+    left: 0!important;
+    width: 20rem!important;
+    background-color: #dbdbdb!important;
+    transition: 0.3s!important;
+    overflow-y: auto!important;
+    padding-right: 1rem!important;
+    text-align: left;
+    display: block;
+    font-family: "Roboto", "Open Sans", "Poppins", Arial, sans-serif!important;
+}
+
+.sidebar.closed {
+    transform: translateX(-21rem)!important;
+}
+
+.sidebar .title {
+    margin: 2rem!important;
+    margin-top: 1.5rem!important;
+    margin-bottom: -1rem!important;
+    font-size: 1.4rem!important;
+    color: #000!important;
+}
+
+.navItemsContainer {
+    padding-top: 1rem!important;
+    margin-left: 2rem!important;
+}
+
+.navItemsContainer a, .sidebar a {
+    text-decoration: none!important;
+    padding: 0.5rem!important;
+}
+
+.sidebar .title:hover {
+    color: rgb(122, 122, 122)!important;
+}
+
+.nav-item {
+    color: #000!important;
+    list-style: none!important;
+    font-size: 1.2rem!important;
+}
+
+.nav-item li {
+    list-style: none!important;
+}
+
+#more-icon {
+    cursor: pointer!important;
+    z-index: 10!important;
+    height: 2rem!important;
+    position: fixed!important;
+    top: 0rem!important;
+    left: 0rem!important;
+    padding: 0.7rem!important;
+    font-size: 2rem!important;
+}
+
+.title .nav-item {
+    text-align: left!important;
+    margin: 0!important;
+}
+
+.subTitle {
+    margin-bottom: 0.8rem!important;
+}
+
+.subContent, .logout, .home {
+    background-color: #ececec!important;
+    margin-bottom: 1rem!important;
+}
+
+.subContent li, .logout, .home {
+    margin: 0!important;
+    margin-top: -1rem!important;
+    padding: 0.5rem 1rem!important;
+    transition: 0.2s ease!important;
+}
+
+.subContent li:hover, .logout:hover, .home:hover {
+    background-color: rgb(197, 255, 255)!important;
+}
+
+.nav-item.last-li {
+    margin-bottom: -1rem!important;
+}
+
+.container {
+    min-height: 91vh!important;
+}
+
+.open-overlay {
+    opacity: 0.3!important;
+    height: 100vh!important;
+    width: 100vw!important;
+    position: fixed!important;
+    top: 0!important;
+    left: 0!important;
+    z-index: -5!important;
+}
+
+.open-overlay.active {
+    z-index: 3!important;
+    background-color: #000!important;
+}
+
+.full-screen {
+    cursor: pointer!important;
+}

@@ -1,0 +1,132 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins&family=Roboto&family=Ubuntu&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", "Open Sans", "Poppins", Arial, sans-serif;
+}
+
+body {
+    font-size: 15px;
+    overflow-x: hidden;
+    z-index: 1;
+    max-width: 100vw;
+}
+
+.container {
+    margin: 2rem 3rem;
+}
+
+.container .title {
+    font-size: 1.4rem;
+    font-family: "Poppins", "Open Sans", "Roboto", Arial, sans-serif;
+}
+
+#logOut {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 1.4rem;
+    background-color: #1abc9c;
+    border: 1px solid rgb(113, 113, 113);
+    border-radius: 0.5rem;
+    transition: 0.2s ease;
+    color: #fff;
+}
+
+#logOut:hover {
+    background-color: #28917c;
+}
+
+#custom-cm {
+    z-index: 5;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    padding: 10px 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+}
+
+.custom-cm__item {
+    cursor: pointer;
+    padding: 8px 15px;
+    transition: 0.3s;
+}
+
+.custom-cm__item:hover {
+    background-color: #efefef;
+}
+
+.custom-cm__divider {
+    border-bottom: 1px solid #c9c9c9;
+    margin: 10px;
+}
+
+.cursor {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%) scale(0);
+    animation: scale-up 0.6s;
+    border: 2px solid #606060;
+    z-index: 20;
+}
+
+.cursor::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    border: 2px solid #313131;
+    border-radius: 50%;
+    z-index: 20;
+}
+
+#loading-overlay.active {
+    z-index: 15;
+}
+
+@keyframes scale-up {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+div[data-testid="audio-loading"] {
+    position: relative;
+}
+
+#loading-overlay {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 1000px) {
+    body {
+        font-size: 25px;
+    }
+}
