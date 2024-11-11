@@ -105,7 +105,7 @@ A sample list of concerns from End-user organization are depicted here:
 - **Login Information**
 
   - Email: `atlincharge22@gmail.com`
-  - Password: `Atl@123`
+  - Password: `atlincharge22@gmail.com`
 
 **Wanna run it locally?**
 
