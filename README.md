@@ -1,6 +1,6 @@
 # Automation of experiential learning with customized, adaptable, and incremental path for skills acquisition.
 
-**Background**
+## **Background**
 
 Education provides knowledge. Knowledge transforms students by introducing skills. Skills
 make students get employment. Experiential learning makes this process more intuitive.
@@ -15,7 +15,7 @@ in schools for students (6th to 12th class) to give shape to their ideas through
 yourself mode and learn innovation skills. Further, HamaraLabs caters to non-ATL school
 students making all stakeholders accountable to skill development process in students.
 
-**Salient features of web app/mobile app**
+## **Salient features of web app/mobile app**
 
 - ATL Team formation/ Roles assignment/ Components Identification & tracking
 - ATL Tinkering activities workflow/tracking/documentation
@@ -37,7 +37,7 @@ students making all stakeholders accountable to skill development process in stu
 - Security management
 - Partnership creation & management
 
-**User Profiles and their purpose of accessing web app/mobile app**
+## **User Profiles and their purpose of accessing web app/mobile app**
 
 - ATL / non-ATL student - Actual student doing tinkering activity
 - ATL/makerspace In-charge – In-charge of ATL lab helping students perform tinkering
@@ -58,14 +58,14 @@ students making all stakeholders accountable to skill development process in stu
 - AIM Management - Get score cards/rankings of ATL’s as per their functioning level,
   Innovations developed, community engagement, fund utilisation etc
 
-**Stakeholders and their concerns**
+## **Stakeholders and their concerns**
 
 The complete list of all stakeholders is depicted in this diagram.
 
 
 A sample list of concerns from End-user organization are depicted here:
 
-**Usage scenarios**
+## **Usage scenarios**
 
 - ATL or makerspace setup in a school – during the initial setting up of
   ATL/makerspace
@@ -79,7 +79,7 @@ A sample list of concerns from End-user organization are depicted here:
   like ATL Tinkerpreneur, Marathon, Smart India hackathon etc
 
 
-**Sample workflow of an ATL executing student tinkering activities**
+## **Sample workflow of an ATL executing student tinkering activities**
 
 - Identify around 15 team leaders and add their student profiles
 - Discuss with team leaders to understand their aspirations and thoughts. Update the
@@ -98,7 +98,7 @@ A sample list of concerns from End-user organization are depicted here:
   procedures. Use the partner onboarding process, college connect form and business
   connect form.
 
-**Access Website ?**
+## **Access Website ?**
 
 - Access [HamaraLabs](http://hamaralabs-dev.web.app)
 
@@ -107,7 +107,7 @@ A sample list of concerns from End-user organization are depicted here:
   - Email: `atlincharge22@gmail.com`
   - Password: `atlincharge22@gmail.com`
 
-**Wanna run it locally?**
+## **Wanna run it locally?**
 
 - Clone the repository
 - Run `npm install --force`
@@ -150,7 +150,7 @@ A sample list of concerns from End-user organization are depicted here:
     - You need to have a firebase blaze account
     - You need to have Nodejs installed in your system
 
-**Technologies**
+## **Technologies**
 
 - ReactJS
 - Bootstrap
